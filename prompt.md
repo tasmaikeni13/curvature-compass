@@ -596,5 +596,3 @@ The central scientific contribution, if supported, should be a principled and ex
 Discover the answer through theory, statistical evidence, formal verification, and rigorous experiments.
 
 **The objective is not to prove that our idea works. The objective is to discover whether it works, why it works, where it works, and whether it genuinely improves upon what already exists.**
-
-Begin with Phase 1.
