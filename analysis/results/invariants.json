@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "acquisition_cases": 640,
+  "maxima": {
+    "cg_energy_relative": 7.086860313233793e-10,
+    "residual_certificate_violation": 1.4431983930956622e-28,
+    "nested_decrease_violation": 2.220446049250313e-16,
+    "schur_gain_relative": 1.2755718963591843e-14,
+    "galerkin_orthogonality": 6.07689391286026e-14,
+    "stopped_prefix_difference": 0.0
+  },
+  "cg_energy_tolerance": 1e-07,
+  "counterexamples": {
+    "non_submodular_gain": 2.1315789473684217,
+    "blind_prefix_gain_stop_count": 1,
+    "certificate_stop_count": 16
+  },
+  "scalar_polarization_max_error": 4.440892098500626e-16
+}

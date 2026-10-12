@@ -1,0 +1,283 @@
+{
+  "retrieved_utc": "2026-10-12T10:40:08.900515+00:00",
+  "records": [
+    {
+      "id": "cg52",
+      "title": "Methods of Conjugate Gradients for Solving Linear Systems",
+      "year": 1952,
+      "url": "https://nvlpubs.nist.gov/nistpubs/jres/049/jresv49n6p409_A1b.pdf",
+      "sha256": "0b5d99551f4aa0a960d85a8b699d7c669d91aeff0a312470bdf531d64e755262",
+      "bytes": 30035429,
+      "text_lines": 2132,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "hf10",
+      "title": "Deep Learning via Hessian-Free Optimization",
+      "year": 2010,
+      "url": "https://icml.cc/Conferences/2010/papers/458.pdf",
+      "sha256": "a893395b6790bfb6e89e7a9da3dff4eb6599e71e92504276314cfab5776c0744",
+      "bytes": 140551,
+      "text_lines": 559,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "quasi13",
+      "title": "Quasi-Newton Methods: A New Direction",
+      "year": 2013,
+      "url": "https://www.jmlr.org/papers/volume14/hennig13a/hennig13a.pdf",
+      "sha256": "2e5832dca7e4b07b762592043c8242c0613638298dee1b4cae68dfa7d14fe481",
+      "bytes": 297809,
+      "text_lines": 1432,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "randqn17",
+      "title": "Randomized Quasi-Newton Updates Are Linearly Convergent Matrix Inversion Algorithms",
+      "year": 2017,
+      "url": "https://arxiv.org/pdf/1602.01768",
+      "sha256": "bc203be86f6cb5323aec57a04d3bf410630d78da5abcf9be4d7e0ab2854fda4f",
+      "bytes": 1168204,
+      "text_lines": 2407,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "blockbfgs16",
+      "title": "Stochastic Block BFGS: Squeezing More Curvature out of Data",
+      "year": 2016,
+      "url": "https://proceedings.mlr.press/v48/gower16.pdf",
+      "sha256": "9e1a2a585f81ae178ad2ddeb9a1b17a91a7401d654fc0c46804f268a26587aa1",
+      "bytes": 364004,
+      "text_lines": 835,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "rsn19",
+      "title": "RSN: Randomized Subspace Newton",
+      "year": 2019,
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2019/file/bc6dc48b743dc5d013b1abaebd2faed2-Paper.pdf",
+      "sha256": "75c9d9c863bf3bb7b896fb7d610aaf2b34459cb8afe4c1f3072cf80ff0e27ea3",
+      "bytes": 755624,
+      "text_lines": 682,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "newtonsketch17",
+      "title": "Newton Sketch: A Near Linear-Time Optimization Algorithm with Linear-Quadratic Convergence",
+      "year": 2017,
+      "url": "https://stanford.edu/~pilanci/papers/PilWai17.pdf",
+      "sha256": "83def36bde81bf53961f54659dfd4cbfdb095349162995a595be97ce77dfd940",
+      "bytes": 592292,
+      "text_lines": 2728,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "adaptivesketch21",
+      "title": "Adaptive Newton Sketch: Linear-time Optimization with Quadratic Convergence and Effective Hessian Dimensionality",
+      "year": 2021,
+      "url": "https://proceedings.mlr.press/v139/lacotte21a/lacotte21a.pdf",
+      "sha256": "d9493c0b72fb652706e3b9b713b8328f05797dc98aa505fdeecaa7a4dc5d0bef",
+      "bytes": 1243752,
+      "text_lines": 766,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "nystrom23",
+      "title": "Randomized Nystrom Preconditioning",
+      "year": 2023,
+      "url": "https://tropp.caltech.edu/papers/FTU23-Randomized-Nystrom-SIMAX.pdf",
+      "sha256": "208cbe21a1d10eaa21ae661dd29abb8e22af584a5cb979ad0366603e52029740",
+      "bytes": 593530,
+      "text_lines": 2528,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "sketchysgd24",
+      "title": "SketchySGD: Reliable Stochastic Optimization via Randomized Curvature Estimates",
+      "year": 2024,
+      "url": "https://arxiv.org/pdf/2211.08597",
+      "sha256": "3291c54e706d696d1acb935a9d12d4dfa9aa43e2365de439775879f8ae9509cd",
+      "bytes": 4530605,
+      "text_lines": 4028,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "matrixrank17",
+      "title": "Low Rank Matrix Recovery from Rank One Measurements",
+      "year": 2017,
+      "url": "https://www.mathc.rwth-aachen.de/~rauhut/files/LowRankMatrixRecoveryKRT.pdf",
+      "sha256": "300bf875624f4b3ce1ba5038aed4cf4fcb15c24e598e0e9a16c2c245b37bdc95",
+      "bytes": 479453,
+      "text_lines": 1657,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "hutchpp21",
+      "title": "Hutch++: Optimal Stochastic Trace Estimation",
+      "year": 2021,
+      "url": "https://arxiv.org/pdf/2010.09649",
+      "sha256": "42131d8143809fe493dcd81f310c5f8017cba2a6ddbcf7f3fb6bbd46340ebd94",
+      "bytes": 4851980,
+      "text_lines": 1363,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "kfac15",
+      "title": "Optimizing Neural Networks with Kronecker-factored Approximate Curvature",
+      "year": 2015,
+      "url": "https://proceedings.mlr.press/v37/martens15.pdf",
+      "sha256": "ea15326875ab24feaf03f73ec7438e04e218b3cd42e884a1d2d9c444dc83166d",
+      "bytes": 866438,
+      "text_lines": 727,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "shampoo18",
+      "title": "Shampoo: Preconditioned Stochastic Tensor Optimization",
+      "year": 2018,
+      "url": "https://proceedings.mlr.press/v80/gupta18a/gupta18a.pdf",
+      "sha256": "779d4d4c9d88a8c7d022596dee8df28268b7f37358af337d38a1a94c16ab73d3",
+      "bytes": 1845568,
+      "text_lines": 706,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "soap24",
+      "title": "SOAP: Improving and Stabilizing Shampoo using Adam",
+      "year": 2024,
+      "url": "https://arxiv.org/pdf/2409.11321",
+      "sha256": "d6f33bb71eab0f046d911b60800846fd3332f1dcf5f2f1434ab444ab89d0b22a",
+      "bytes": 1300562,
+      "text_lines": 1183,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "sophia23",
+      "title": "Sophia: A Scalable Stochastic Second-order Optimizer for Language Model Pre-training",
+      "year": 2023,
+      "url": "https://arxiv.org/pdf/2305.14342",
+      "sha256": "176e26b9c32bfcc36b1db9affba822d2389ee7f83d4dbea2cf2c5bfe44ca72fd",
+      "bytes": 3204564,
+      "text_lines": 1852,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "dan21",
+      "title": "Doubly Adaptive Scaled Algorithm for Machine Learning Using Second-Order Information",
+      "year": 2021,
+      "url": "https://arxiv.org/pdf/2109.05198",
+      "sha256": "095a42131352c5de8d792e8d867f08020cabb4cbc9b58b2c22e73f83f2f23c3a",
+      "bytes": 3701313,
+      "text_lines": 3606,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "problinsolve19",
+      "title": "Probabilistic Linear Solvers: A Unifying View",
+      "year": 2019,
+      "url": "https://arxiv.org/pdf/1810.03398",
+      "sha256": "33d14b287824427e1177ca24ead5de5838f6f4e8dd250dca1eddd7679aa8f8b9",
+      "bytes": 696627,
+      "text_lines": 1277,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "problinsolve20",
+      "title": "Probabilistic Linear Solvers for Machine Learning",
+      "year": 2020,
+      "url": "https://arxiv.org/pdf/2010.09691",
+      "sha256": "7a8006feb993287a5b9d80a73d2af15f0890832497f2967ff341a0429999f7e2",
+      "bytes": 1369375,
+      "text_lines": 2284,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "hvp94",
+      "title": "Fast Exact Multiplication by the Hessian",
+      "year": 1994,
+      "url": "https://www.bcl.hamilton.ie/~barak/papers/nc-hessian.pdf",
+      "resolved_url": "https://www.bcl.hamilton.ie/~barak/papers/nc-hessian.pdf",
+      "sha256": "18e381e20d4ea7c3858ead0cc9e390053ea858655c65085834d6628fc506f4cb",
+      "bytes": 179344,
+      "text_lines": 863,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "newuoa06",
+      "title": "The NEWUOA Software for Unconstrained Optimization Without Derivatives",
+      "year": 2006,
+      "url": "https://optimization-online.org/wp-content/uploads/2005/01/1045.pdf",
+      "resolved_url": "https://optimization-online.org/wp-content/uploads/2005/01/1045.pdf",
+      "sha256": "decde29087062f3ddf96d1f3dd86c26287df314007a37427ac0f4cb50be23640",
+      "bytes": 370995,
+      "text_lines": 2263,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "castro14",
+      "title": "Adaptive Sensing Performance Lower Bounds for Sparse Signal Detection and Support Estimation",
+      "year": 2014,
+      "url": "https://arxiv.org/pdf/1206.0648",
+      "resolved_url": "https://arxiv.org/pdf/1206.0648",
+      "sha256": "26a7db311e870ef75106e0ecd6205a14c5c435ee73c979d9ef4b579c78d4408d",
+      "bytes": 365326,
+      "text_lines": 1707,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "value05",
+      "title": "Near-optimal Nonmyopic Value of Information in Graphical Models",
+      "year": 2005,
+      "url": "https://www.cs.cmu.edu/~guestrin/Publications/UAI2005/uai2005.pdf",
+      "resolved_url": "https://www.cs.cmu.edu/~guestrin/Publications/UAI2005/uai2005.pdf",
+      "sha256": "f96c637f670c2c0202c0b3294f09e07c8895b8e1893362c8da4942a14a378c1d",
+      "bytes": 561878,
+      "text_lines": 599,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "adahessian21",
+      "title": "ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning",
+      "year": 2021,
+      "url": "https://arxiv.org/pdf/2006.00719",
+      "resolved_url": "https://arxiv.org/pdf/2006.00719",
+      "sha256": "bb7e2f599903e0714059e710378dc891baed238722922a15f2d2689ed7626b3b",
+      "bytes": 1818831,
+      "text_lines": 1393,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "randsvd11",
+      "title": "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions",
+      "year": 2011,
+      "url": "https://arxiv.org/pdf/0909.4061",
+      "resolved_url": "https://arxiv.org/pdf/0909.4061",
+      "sha256": "d5d99d95b3d9657de6413f4c26d635238103ef9cf1a28ff1b7fde531cf11f6be",
+      "bytes": 1287227,
+      "text_lines": 4345,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "subsample19",
+      "title": "Exact and Inexact Subsampled Newton Methods for Optimization",
+      "year": 2019,
+      "url": "https://optimization-online.org/wp-content/uploads/2016/09/5653.pdf",
+      "resolved_url": "https://optimization-online.org/wp-content/uploads/2016/09/5653.pdf",
+      "sha256": "023146a72d87b06c6e79d86eb36b3f0b0a5a3d3c26c3926a700d381af6ada001",
+      "bytes": 598605,
+      "text_lines": 2414,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "minres22",
+      "title": "MINRES: From Negative Curvature Detection to Monotonicity Properties",
+      "year": 2022,
+      "url": "https://arxiv.org/pdf/2206.05732",
+      "resolved_url": "https://arxiv.org/pdf/2206.05732",
+      "sha256": "ffc96b8c91257b814185708e17dbd158c8fc68a4f5490134cbabc768b2c570df",
+      "bytes": 1637677,
+      "text_lines": 1647,
+      "status": "downloaded_and_extracted"
+    }
+  ]
+}
