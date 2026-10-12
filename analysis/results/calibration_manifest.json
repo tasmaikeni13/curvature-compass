@@ -1,0 +1,107 @@
+{
+  "stage": "calibration",
+  "started_utc": "2026-10-12T10:44:02.834534+00:00",
+  "seconds": 13.275235834007617,
+  "seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009,
+    1010,
+    1011,
+    1012,
+    1013,
+    1014,
+    1015,
+    1016,
+    1017,
+    1018,
+    1019,
+    1020,
+    1021,
+    1022,
+    1023
+  ],
+  "rows": 552960,
+  "problem_instances": 2304,
+  "dimensions": [
+    16,
+    48,
+    96
+  ],
+  "caps": [
+    2,
+    8,
+    16
+  ],
+  "families": [
+    "flat",
+    "diagonal",
+    "rotated",
+    "lowrank",
+    "clustered",
+    "toeplitz",
+    "blocks",
+    "needle"
+  ],
+  "regimes": [
+    "isotropic",
+    "error",
+    "low",
+    "high"
+  ],
+  "stopping_candidates": [
+    [
+      "fixed",
+      0.0
+    ],
+    [
+      "residual",
+      0.1
+    ],
+    [
+      "residual",
+      0.3
+    ],
+    [
+      "residual",
+      0.7
+    ],
+    [
+      "gain",
+      0.01
+    ],
+    [
+      "gain",
+      0.1
+    ],
+    [
+      "cost",
+      0.01
+    ],
+    [
+      "cost",
+      0.05
+    ]
+  ],
+  "workers": 8,
+  "python": "3.10.12",
+  "numpy": "2.2.6",
+  "scipy": "1.15.3",
+  "platform": "Linux-5.19.0-1022-gcp-x86_64-with-glibc2.35",
+  "blas_threads": "1",
+  "source_sha256": {
+    "src/curvature_compass/__init__.py": "76884bb56779c5dda51abaa12bf0034ae242650bf16bca9e334b3b620732f9cc",
+    "src/curvature_compass/checks.py": "9aed2bc26e4992f9762b4986ef5bfc77856868fc48fe671339029f5d1546f9f2",
+    "src/curvature_compass/study.py": "ee33256b0b3ab24a1f5119b6758d59ec3276886b5f53b4a23373aa2df9be097b",
+    "src/curvature_compass/core.py": "b6e657ca53cbf34706764392e89b8572edebd4955fa0c1713bf774532af90679"
+  },
+  "raw_sha256": "201ee9ae6d7ae67c3ca13fbfa8ec337968392c75461332536b6e19f9a7191c13",
+  "accounting": "Full acquisition paths reused across candidate caps/stopping rules; each policy charged its exact prefix count and measured prefix time, including full-cap stream setup. Candidate-search total cost is the actual full-path run cost; policy-prefix counts are not added to pretend these were separate oracle executions."
+}

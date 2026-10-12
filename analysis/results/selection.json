@@ -1,0 +1,538 @@
+{
+  "criterion": "balanced mean Newton-progress per charged HVP across all calibration populations and caps",
+  "calibration_seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009,
+    1010,
+    1011,
+    1012,
+    1013,
+    1014,
+    1015,
+    1016,
+    1017,
+    1018,
+    1019,
+    1020,
+    1021,
+    1022,
+    1023
+  ],
+  "main_cap": 8,
+  "fixed_alignment": "prior",
+  "adaptive_alignment": "krylov",
+  "stopping": "residual",
+  "tolerance": 0.7,
+  "configurations": {
+    "A": {
+      "alignment": "prior",
+      "stopping": "fixed",
+      "tolerance": 0.0
+    },
+    "B": {
+      "alignment": "krylov",
+      "stopping": "fixed",
+      "tolerance": 0.0
+    },
+    "C": {
+      "alignment": "prior",
+      "stopping": "residual",
+      "tolerance": 0.7
+    },
+    "D": {
+      "alignment": "krylov",
+      "stopping": "residual",
+      "tolerance": 0.7
+    }
+  },
+  "candidate_scores": [
+    {
+      "alignment": "coordinate",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.0453470092265758
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.06252692856899288
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.07192393380565534
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.08813145999731124
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.052508577799623986
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.056264777067383254
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.06480252362862055
+    },
+    {
+      "alignment": "coordinate",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.06425016458797211
+    },
+    {
+      "alignment": "haar",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.049991191929947554
+    },
+    {
+      "alignment": "haar",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.07456899247909146
+    },
+    {
+      "alignment": "haar",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.0886423915359196
+    },
+    {
+      "alignment": "haar",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.10200799959629923
+    },
+    {
+      "alignment": "haar",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.06204269320717861
+    },
+    {
+      "alignment": "haar",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.06661182058882201
+    },
+    {
+      "alignment": "haar",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.08289887070352189
+    },
+    {
+      "alignment": "haar",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.08272590266894853
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.04957448326837271
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.0796945445670839
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.09129374928663389
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.10309605903047096
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.06130183868305522
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.06703890594104518
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.08452484974347069
+    },
+    {
+      "alignment": "rademacher",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.08473416676012767
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.051585560247269846
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.08689985627636149
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.09871349383766842
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.11026724122941495
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.06578112478971028
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.07184106758367134
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.09059622907322486
+    },
+    {
+      "alignment": "cosine",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.09072757510596716
+    },
+    {
+      "alignment": "prior",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.05629400690091783
+    },
+    {
+      "alignment": "prior",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.08931463496981339
+    },
+    {
+      "alignment": "prior",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.10422060338007547
+    },
+    {
+      "alignment": "prior",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.11792353488181577
+    },
+    {
+      "alignment": "prior",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.07268302952724975
+    },
+    {
+      "alignment": "prior",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.07701792414354526
+    },
+    {
+      "alignment": "prior",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.09298768860894491
+    },
+    {
+      "alignment": "prior",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.09232954951136517
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.4761184808318375
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.5863253894528287
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.6704365339201507
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.7026300773709396
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.5061112129206994
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.5387414647920866
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.6348522794015898
+    },
+    {
+      "alignment": "krylov",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.6285489098989435
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.12176780886831819
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.196633791296912
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.23609840663518933
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.2977069464307987
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.15689021518808494
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.19003148923092716
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.245512753194793
+    },
+    {
+      "alignment": "greedy_coordinate",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.2505078302718932
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.16931441090053667
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.4865315678863557
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.602163530406994
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.6605916447554675
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.3344315663727198
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.34797026847824003
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.4946875866657873
+    },
+    {
+      "alignment": "gradient_random",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.49574696551396585
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.17185095990964322
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.4928652299404976
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.6065999271044562
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.6645292262031935
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.3349715437449178
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.3503172933273658
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.49601680382407765
+    },
+    {
+      "alignment": "gradient_cosine",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.49630902400347743
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "fixed",
+      "tolerance": 0.0,
+      "score": 0.16551205193952084
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.1,
+      "score": 0.483375540009219
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.3,
+      "score": 0.5968806480933224
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "residual",
+      "tolerance": 0.7,
+      "score": 0.6547634630394775
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "gain",
+      "tolerance": 0.01,
+      "score": 0.3294809715095281
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "gain",
+      "tolerance": 0.1,
+      "score": 0.34236185313294193
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "cost",
+      "tolerance": 0.01,
+      "score": 0.49008945961115835
+    },
+    {
+      "alignment": "gradient_coordinate",
+      "stopping": "cost",
+      "tolerance": 0.05,
+      "score": 0.4922624360988706
+    }
+  ]
+}
