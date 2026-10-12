@@ -1,0 +1,17 @@
+ℹ [8924/8925] Built CurvatureCompass (6.4s)
+info: CurvatureCompass.lean:163:0: 'CurvatureCompass.quadratic_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:164:0: 'CurvatureCompass.subspace_optimality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:165:0: 'CurvatureCompass.nested_subspace_monotone' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:166:0: 'CurvatureCompass.coercive_residual_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:167:0: 'CurvatureCompass.schur_gain_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:168:0: 'CurvatureCompass.scalar_same_vector_different' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:169:0: 'CurvatureCompass.scalar_polarization' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:170:0: 'CurvatureCompass.coordinate_scalar_blindness' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:171:0: 'CurvatureCompass.vector_first_column_identifies_coupling' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:172:0: 'CurvatureCompass.positive_schur' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:173:0: 'CurvatureCompass.negative_curvature_escape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:174:0: 'CurvatureCompass.marginal_gains_not_submodular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:175:0: 'CurvatureCompass.coupled_counterexample_coercive' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:176:0: 'CurvatureCompass.residual_perturbation_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CurvatureCompass.lean:177:0: 'CurvatureCompass.objective_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (8925 jobs).

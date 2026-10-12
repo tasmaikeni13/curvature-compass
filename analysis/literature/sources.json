@@ -25,5 +25,8 @@
  {"id":"adahessian21","title":"ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning","year":2021,"url":"https://arxiv.org/pdf/2006.00719"},
  {"id":"randsvd11","title":"Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions","year":2011,"url":"https://arxiv.org/pdf/0909.4061"},
  {"id":"subsample19","title":"Exact and Inexact Subsampled Newton Methods for Optimization","year":2019,"url":"https://optimization-online.org/wp-content/uploads/2016/09/5653.pdf"},
- {"id":"minres22","title":"MINRES: From Negative Curvature Detection to Monotonicity Properties","year":2022,"url":"https://arxiv.org/pdf/2206.05732"}
+ {"id":"minres22","title":"MINRES: From Negative Curvature Detection to Monotonicity Properties","year":2022,"url":"https://arxiv.org/pdf/2206.05732"},
+ {"id":"goaldesign18","title":"Goal-Oriented Optimal Design of Experiments for Large-Scale Bayesian Linear Inverse Problems","year":2018,"url":"https://arxiv.org/pdf/1802.06517"},
+ {"id":"adaptivehutch22","title":"Improved Variants of the Hutch++ Algorithm for Trace Estimation","year":2022,"url":"https://arxiv.org/pdf/2109.10659"},
+ {"id":"forcing96","title":"Choosing the Forcing Terms in an Inexact Newton Method","year":1996,"url":"https://users.wpi.edu/~walker/Papers/forcing_terms%2CSISC_17%2C1996%2C16-32.pdf"}
 ]

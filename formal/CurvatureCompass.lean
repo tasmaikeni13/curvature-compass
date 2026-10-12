@@ -99,7 +99,8 @@ theorem schur_gain_identity (a b c u v : ℝ) (ha : a ≠ 0)
   have hschur : c-b^2/a = (a*c-b^2)/a := by field_simp
   rw [hschur]
   field_simp [ha, hdet]
-  <;> ring
+  field_simp [hdet]
+  ring
 
 theorem positive_schur (a b c : ℝ) (ha : 0 < a) (hd : 0 < a*c-b^2) :
     0 < c-b^2/a := by
@@ -118,12 +119,62 @@ theorem marginal_gains_not_submodular :
     (1:ℝ)/2 < 1/(2*(1-(9/10:ℝ)^2)) := by
   norm_num
 
+theorem coupled_counterexample_coercive (x y : ℝ) :
+    (1/10:ℝ)*(x^2+y^2) ≤ scalarCurve 1 (9/10) 1 x y := by
+  unfold scalarCurve
+  nlinarith [sq_nonneg (x+y)]
+
+section Perturbation
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+
+/-- Known operator and gradient errors enlarge a residual certificate. -/
+theorem residual_perturbation_bound (K Kobs : E →ₗ[ℝ] E) (g gobs s : E)
+    (epsilon eta : ℝ)
+    (gradient_error : ‖g-gobs‖ ≤ eta)
+    (operator_error : ∀ v, ‖K v-Kobs v‖ ≤ epsilon*‖v‖) :
+    ‖g+K s‖ ≤ ‖gobs+Kobs s‖ + epsilon*‖s‖ + eta := by
+  have hdiff : g+K s = (gobs+Kobs s) + ((g-gobs)+(K s-Kobs s)) := by abel
+  rw [hdiff]
+  calc
+    ‖gobs+Kobs s + ((g-gobs)+(K s-Kobs s))‖ ≤
+        ‖gobs+Kobs s‖ + ‖(g-gobs)+(K s-Kobs s)‖ := norm_add_le _ _
+    _ ≤ ‖gobs+Kobs s‖ + (‖g-gobs‖+‖K s-Kobs s‖) := by
+      calc
+        _ = ‖g-gobs + (K s-Kobs s)‖ + ‖gobs+Kobs s‖ := by ring
+        _ ≤ ‖g-gobs‖ + ‖K s-Kobs s‖ + ‖gobs+Kobs s‖ := by
+          simpa [add_comm, add_left_comm, add_assoc] using
+            add_le_add_right (norm_add_le (g-gobs) (K s-Kobs s)) ‖gobs+Kobs s‖
+        _ = ‖gobs+Kobs s‖ + (‖g-gobs‖+‖K s-Kobs s‖) := by ring
+    _ ≤ ‖gobs+Kobs s‖ + (eta+epsilon*‖s‖) :=
+      by linarith [operator_error s]
+    _ = ‖gobs+Kobs s‖ + epsilon*‖s‖ + eta := by ring
+
+end Perturbation
+
+/-- Convert a remaining-gap certificate into a captured-decrease target. -/
+theorem objective_certificate (decrease gap epsilon : ℝ) (hepsilon : epsilon < 1)
+    (bound : gap ≤ epsilon/(1-epsilon)*decrease) :
+    (1-epsilon)*(decrease+gap) ≤ decrease := by
+  have hden : 0 < 1-epsilon := by linarith
+  rw [div_mul_eq_mul_div] at bound
+  have hmul := (le_div_iff₀ hden).mp bound
+  nlinarith
+
 #print axioms quadratic_gap
 #print axioms subspace_optimality
 #print axioms nested_subspace_monotone
 #print axioms coercive_residual_bound
 #print axioms schur_gain_identity
 #print axioms scalar_same_vector_different
+#print axioms scalar_polarization
+#print axioms coordinate_scalar_blindness
+#print axioms vector_first_column_identifies_coupling
+#print axioms positive_schur
+#print axioms negative_curvature_escape
+#print axioms marginal_gains_not_submodular
+#print axioms coupled_counterexample_coercive
+#print axioms residual_perturbation_bound
+#print axioms objective_certificate
 
 end
 end CurvatureCompass

@@ -1,0 +1,57 @@
+{
+  "status": "passed",
+  "runs": [
+    {
+      "stage": "calibration",
+      "rows": 552960,
+      "raw_sha256": "201ee9ae6d7ae67c3ca13fbfa8ec337968392c75461332536b6e19f9a7191c13"
+    },
+    {
+      "stage": "evaluation",
+      "rows": 1474560,
+      "raw_sha256": "763d409989b838f66c0401771ec51d443e330cec7f2596ec2005aceb5403d51b"
+    },
+    {
+      "stage": "reference",
+      "rows": 1792,
+      "raw_sha256": "ad20fe31d3a9a071cef6806d3f40741327fb022624d42e1ff683d747fe090478"
+    },
+    {
+      "stage": "iterative",
+      "rows": 126704,
+      "raw_sha256": "6e2ea2a8ff9656d63bbfdd5038d7d5889bc9b7ecf34dc5c2b999c3073d490a09"
+    },
+    {
+      "stage": "noise",
+      "rows": 8192,
+      "raw_sha256": "0fdd3e1cc5312f1c5118440a4653bb8a2f1d1fb0bb82ea83f93a3cd93dbae6d4"
+    },
+    {
+      "stage": "drift",
+      "rows": 128,
+      "raw_sha256": "c411a909b1abd95149c0448d3677405309c3853fa49d2a8fa1fa2427f6a46740"
+    },
+    {
+      "stage": "nonconvex",
+      "rows": 288,
+      "raw_sha256": "3931d8a0047e52dcbde6311c285f18c0940ada87a4aeee96f5fad2a453650c46"
+    },
+    {
+      "stage": "accuracy",
+      "rows": 18432,
+      "raw_sha256": "1360a3c62f4f96841f346dde88d3f7f95e73f0e9e241c8b0b4cc5a096d8bf5c5"
+    },
+    {
+      "stage": "scalar",
+      "rows": 3456,
+      "raw_sha256": "f80f2f77b8e1c29ea22ae6eebc748f5291d4a48150f141e63ffe4ca2169f6252"
+    },
+    {
+      "stage": "scaling",
+      "rows": 432,
+      "raw_sha256": "99bd69dced7724af82327b8f1a937fe21dfd2d2b6f34bd3c13b735ecbe7f5109"
+    }
+  ],
+  "primary_sources": 30,
+  "lean_theorems": 15
+}

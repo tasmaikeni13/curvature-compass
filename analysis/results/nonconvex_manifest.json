@@ -1,0 +1,17 @@
+{
+  "study": "nonconvex",
+  "utc": "2026-10-12T10:59:47.090097+00:00",
+  "seconds": 0.16249804799736012,
+  "records": 288,
+  "raw_sha256": "3931d8a0047e52dcbde6311c285f18c0940ada87a4aeee96f5fad2a453650c46",
+  "source_sha256": {
+    "src/curvature_compass/__init__.py": "76884bb56779c5dda51abaa12bf0034ae242650bf16bca9e334b3b620732f9cc",
+    "src/curvature_compass/checks.py": "9aed2bc26e4992f9762b4986ef5bfc77856868fc48fe671339029f5d1546f9f2",
+    "src/curvature_compass/report.py": "379e564109192076c7c7b299e3eba281dc1ba2de9f66f83c23b068238a3e35e0",
+    "src/curvature_compass/study.py": "ee33256b0b3ab24a1f5119b6758d59ec3276886b5f53b4a23373aa2df9be097b",
+    "src/curvature_compass/core.py": "b6e657ca53cbf34706764392e89b8572edebd4955fa0c1713bf774532af90679",
+    "src/curvature_compass/refinements.py": "a3a75a11481b100e3111ea90d1d88b1cb91add4a5f8fb3e0dbe6c265dd8170f7"
+  },
+  "blas_threads": "1",
+  "status": "completed"
+}

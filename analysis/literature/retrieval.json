@@ -1,5 +1,5 @@
 {
-  "retrieved_utc": "2026-10-12T10:40:08.900515+00:00",
+  "retrieved_utc": "2026-10-12T10:51:11.280909+00:00",
   "records": [
     {
       "id": "cg52",
@@ -196,7 +196,6 @@
       "title": "Fast Exact Multiplication by the Hessian",
       "year": 1994,
       "url": "https://www.bcl.hamilton.ie/~barak/papers/nc-hessian.pdf",
-      "resolved_url": "https://www.bcl.hamilton.ie/~barak/papers/nc-hessian.pdf",
       "sha256": "18e381e20d4ea7c3858ead0cc9e390053ea858655c65085834d6628fc506f4cb",
       "bytes": 179344,
       "text_lines": 863,
@@ -207,7 +206,6 @@
       "title": "The NEWUOA Software for Unconstrained Optimization Without Derivatives",
       "year": 2006,
       "url": "https://optimization-online.org/wp-content/uploads/2005/01/1045.pdf",
-      "resolved_url": "https://optimization-online.org/wp-content/uploads/2005/01/1045.pdf",
       "sha256": "decde29087062f3ddf96d1f3dd86c26287df314007a37427ac0f4cb50be23640",
       "bytes": 370995,
       "text_lines": 2263,
@@ -218,7 +216,6 @@
       "title": "Adaptive Sensing Performance Lower Bounds for Sparse Signal Detection and Support Estimation",
       "year": 2014,
       "url": "https://arxiv.org/pdf/1206.0648",
-      "resolved_url": "https://arxiv.org/pdf/1206.0648",
       "sha256": "26a7db311e870ef75106e0ecd6205a14c5c435ee73c979d9ef4b579c78d4408d",
       "bytes": 365326,
       "text_lines": 1707,
@@ -229,7 +226,6 @@
       "title": "Near-optimal Nonmyopic Value of Information in Graphical Models",
       "year": 2005,
       "url": "https://www.cs.cmu.edu/~guestrin/Publications/UAI2005/uai2005.pdf",
-      "resolved_url": "https://www.cs.cmu.edu/~guestrin/Publications/UAI2005/uai2005.pdf",
       "sha256": "f96c637f670c2c0202c0b3294f09e07c8895b8e1893362c8da4942a14a378c1d",
       "bytes": 561878,
       "text_lines": 599,
@@ -240,7 +236,6 @@
       "title": "ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning",
       "year": 2021,
       "url": "https://arxiv.org/pdf/2006.00719",
-      "resolved_url": "https://arxiv.org/pdf/2006.00719",
       "sha256": "bb7e2f599903e0714059e710378dc891baed238722922a15f2d2689ed7626b3b",
       "bytes": 1818831,
       "text_lines": 1393,
@@ -251,7 +246,6 @@
       "title": "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions",
       "year": 2011,
       "url": "https://arxiv.org/pdf/0909.4061",
-      "resolved_url": "https://arxiv.org/pdf/0909.4061",
       "sha256": "d5d99d95b3d9657de6413f4c26d635238103ef9cf1a28ff1b7fde531cf11f6be",
       "bytes": 1287227,
       "text_lines": 4345,
@@ -262,7 +256,6 @@
       "title": "Exact and Inexact Subsampled Newton Methods for Optimization",
       "year": 2019,
       "url": "https://optimization-online.org/wp-content/uploads/2016/09/5653.pdf",
-      "resolved_url": "https://optimization-online.org/wp-content/uploads/2016/09/5653.pdf",
       "sha256": "023146a72d87b06c6e79d86eb36b3f0b0a5a3d3c26c3926a700d381af6ada001",
       "bytes": 598605,
       "text_lines": 2414,
@@ -273,10 +266,42 @@
       "title": "MINRES: From Negative Curvature Detection to Monotonicity Properties",
       "year": 2022,
       "url": "https://arxiv.org/pdf/2206.05732",
-      "resolved_url": "https://arxiv.org/pdf/2206.05732",
       "sha256": "ffc96b8c91257b814185708e17dbd158c8fc68a4f5490134cbabc768b2c570df",
       "bytes": 1637677,
       "text_lines": 1647,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "goaldesign18",
+      "title": "Goal-Oriented Optimal Design of Experiments for Large-Scale Bayesian Linear Inverse Problems",
+      "year": 2018,
+      "url": "https://arxiv.org/pdf/1802.06517",
+      "resolved_url": "https://arxiv.org/pdf/1802.06517",
+      "sha256": "0d1b89046024ce8b33f4c974bc56f5747373d99e590520e1232c32e7eae1c8bc",
+      "bytes": 6746979,
+      "text_lines": 2638,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "adaptivehutch22",
+      "title": "Improved Variants of the Hutch++ Algorithm for Trace Estimation",
+      "year": 2022,
+      "url": "https://arxiv.org/pdf/2109.10659",
+      "resolved_url": "https://arxiv.org/pdf/2109.10659",
+      "sha256": "313d0abdd607a97df6151ae91800decccb0165bc5de3429b75d70f49c468a914",
+      "bytes": 1801227,
+      "text_lines": 1706,
+      "status": "downloaded_and_extracted"
+    },
+    {
+      "id": "forcing96",
+      "title": "Choosing the Forcing Terms in an Inexact Newton Method",
+      "year": 1996,
+      "url": "https://users.wpi.edu/~walker/Papers/forcing_terms%2CSISC_17%2C1996%2C16-32.pdf",
+      "resolved_url": "https://users.wpi.edu/~walker/Papers/forcing_terms%2CSISC_17%2C1996%2C16-32.pdf",
+      "sha256": "9652e5fce35a4417605ed2cb8abc1141ebe733a0d83c18e2d52440d95959334b",
+      "bytes": 1831662,
+      "text_lines": 1043,
       "status": "downloaded_and_extracted"
     }
   ]
