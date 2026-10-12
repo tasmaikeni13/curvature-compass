@@ -1,0 +1,147 @@
+{
+  "stage": "evaluation",
+  "started_utc": "2026-10-12T10:46:30.551273+00:00",
+  "seconds": 31.23306042900367,
+  "seeds": [
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030,
+    2031,
+    2032,
+    2033,
+    2034,
+    2035,
+    2036,
+    2037,
+    2038,
+    2039,
+    2040,
+    2041,
+    2042,
+    2043,
+    2044,
+    2045,
+    2046,
+    2047,
+    2048,
+    2049,
+    2050,
+    2051,
+    2052,
+    2053,
+    2054,
+    2055,
+    2056,
+    2057,
+    2058,
+    2059,
+    2060,
+    2061,
+    2062,
+    2063
+  ],
+  "rows": 1474560,
+  "problem_instances": 6144,
+  "dimensions": [
+    16,
+    48,
+    96
+  ],
+  "caps": [
+    2,
+    8,
+    16
+  ],
+  "families": [
+    "flat",
+    "diagonal",
+    "rotated",
+    "lowrank",
+    "clustered",
+    "toeplitz",
+    "blocks",
+    "needle"
+  ],
+  "regimes": [
+    "isotropic",
+    "error",
+    "low",
+    "high"
+  ],
+  "stopping_candidates": [
+    [
+      "fixed",
+      0.0
+    ],
+    [
+      "residual",
+      0.1
+    ],
+    [
+      "residual",
+      0.3
+    ],
+    [
+      "residual",
+      0.7
+    ],
+    [
+      "gain",
+      0.01
+    ],
+    [
+      "gain",
+      0.1
+    ],
+    [
+      "cost",
+      0.01
+    ],
+    [
+      "cost",
+      0.05
+    ]
+  ],
+  "workers": 8,
+  "python": "3.10.12",
+  "numpy": "2.2.6",
+  "scipy": "1.15.3",
+  "platform": "Linux-5.19.0-1022-gcp-x86_64-with-glibc2.35",
+  "blas_threads": "1",
+  "source_sha256": {
+    "src/curvature_compass/__init__.py": "76884bb56779c5dda51abaa12bf0034ae242650bf16bca9e334b3b620732f9cc",
+    "src/curvature_compass/checks.py": "9aed2bc26e4992f9762b4986ef5bfc77856868fc48fe671339029f5d1546f9f2",
+    "src/curvature_compass/study.py": "ee33256b0b3ab24a1f5119b6758d59ec3276886b5f53b4a23373aa2df9be097b",
+    "src/curvature_compass/core.py": "b6e657ca53cbf34706764392e89b8572edebd4955fa0c1713bf774532af90679"
+  },
+  "raw_sha256": "763d409989b838f66c0401771ec51d443e330cec7f2596ec2005aceb5403d51b",
+  "accounting": "Full acquisition paths reused across candidate caps/stopping rules; each policy charged its exact prefix count and measured prefix time, including full-cap stream setup. Candidate-search total cost is the actual full-path run cost; policy-prefix counts are not added to pretend these were separate oracle executions."
+}
