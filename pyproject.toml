@@ -19,6 +19,10 @@ compass-data = "curvature_compass.lm.data:main"
 compass-train = "curvature_compass.lm.train:main"
 compass-calibrate = "curvature_compass.lm.calibrate:main"
 compass-benchmark = "curvature_compass.lm.benchmark:main"
+compass-compare = "curvature_compass.lm.compare:main"
+compass-sweep = "curvature_compass.lm.sweep:main"
+compass-sweep-gate = "curvature_compass.lm.sweep_gate:main"
+compass-smoke = "curvature_compass.lm.smoke:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

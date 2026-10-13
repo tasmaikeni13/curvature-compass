@@ -4,7 +4,8 @@ Research on directional curvature acquisition, with a completed Phase 1
 foundation and prepared A/B/C/D language-model implementations. The common
 decoder has 60,957,184 parameters and a frozen 990,810,689-token FineWeb-Edu
 budget. Preparation and actual v4-32 stationary benchmarks are complete;
-full training is left to the user. `prompt.md` now has five phases, with the
+full training is left to the user. Phase 3 screening and the Phase 4 five-optimizer
+600M sweep implementations are also prepared. `prompt.md` now has five phases, with the
 standalone kernel phase removed and later phases renumbered.
 
 The current conclusions and open question are in [`theory.md`](theory.md).
@@ -87,6 +88,40 @@ Copy the same prepared inputs to every worker. Regenerate validation evidence
 and the gate for a different runtime or corpus. Small CPU fixtures and actual
 TPU derivative checks are separate from full-size stationary timing; no full
 60M multi-step training or full-size recovery run is claimed.
+
+## Phase 3 selection and Phase 4 sweeps
+
+The five `configs/lm600m_*.json` templates use **596,993,280 parameters**,
+standard JAX/XLA, BF16 training and float32 state/curvature. The sweep implements
+the actual Phase 3 tomography winner, AdamW, Muon with auxiliary AdamW, SOAP,
+and sampled-label Sophia-G. The tomography template's D cell is provisional;
+the generator replaces it with the evidence-backed Phase 3 selection.
+
+After your 60M runs finish, these commands inspect/generate artifacts without
+starting training:
+
+```sh
+JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.compare \
+  --runs runs/A runs/B runs/C runs/D --output runs/phase3-selection.json
+JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.sweep plan \
+  --winner runs/phase3-selection.json --output runs/phase4-plan
+JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.sweep_gate requirements \
+  --plan runs/phase4-plan/plan.json
+```
+
+Defaults are **24 settings × 5 optimizers × 3 seeds = 360 trials**, each exactly
+**2,500 steps / 163,840,000 predicted tokens**. The registered plan varies
+hyperparameters jointly, includes default candidates, matches initialization
+and data-order seed pairs, and freezes controls before execution. Reports
+retain failed trials, tuning costs, seed variability and quality/time frontiers.
+
+Read [the protocol](analysis/phase34_protocol.md),
+[the smoke results and limits](analysis/phase34_results.md), and
+[the launch/recovery guide](analysis/phase34_launch.md). Bounded tiny-model
+checks establish implementation behavior. Before your sweep, its separate
+gate requires actual 600M-shape smoke/recovery evidence; the 60M preparation
+gate cannot authorize the new scale. Full comparisons and sweeps were left
+unexecuted for you.
 
 ## Phase 1 reproduction
 

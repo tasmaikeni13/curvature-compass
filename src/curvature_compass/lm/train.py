@@ -10,11 +10,12 @@ import numpy as np
 from . import checkpoint
 from .artifacts import atomic_json, environment, sha256, source_hashes
 from .calibrate import load_prior
-from .config import load_config
 from .data import TokenBlocks, verify_data
+from .execution import OptimizerExecution
+from .experiments import load_run_config, optimizer_name
 from .gate import validate_gate
 from .model import Decoder
-from .optim import TomographyState, clip_gradient, empty_state, learning_rate, make_gradient, make_refresh, make_update
+from .optim import clip_gradient, learning_rate, make_gradient
 from .runtime import any_host_stop, global_batch, host_array, host_stats, initialize, mesh_and_shardings, sync
 
 
@@ -44,22 +45,32 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     if smoke_steps is not None and not 1 <= smoke_steps <= 8:
         raise ValueError("Infrastructure smoke checks are limited to 1–8 steps")
     startup_started = time.perf_counter()
+    config.validate()
     decoder = Decoder(config.model)
     data = Path(data)
     manifest = verify_data(data, full=True)
     if manifest["vocab_size"] != config.model.vocab_size:
         raise ValueError("Model and tokenizer vocabulary differ")
     data_hash = sha256(data / "manifest.json")
-    frame, prior_record = load_prior(prior_path, decoder, config.optimizer.cap, data_hash)
-    if prior_record["seed"] == config.seed:
-        raise ValueError("Fixed prior must use an independent model initialization")
-    prior_hash = sha256(prior_path)
+    mesh, replicated, batch_sharding = mesh_and_shardings()
+    optimizer = OptimizerExecution(decoder, config, mesh, replicated)
+    frame, prior_hash = None, None
+    if optimizer.needs_prior:
+        if prior_path is None:
+            raise ValueError("This tomography configuration requires its independent model-scale PCA prior")
+        frame, prior_record = load_prior(prior_path, decoder, config.optimizer.cap, data_hash)
+        if prior_record["seed"] == config.seed:
+            raise ValueError("Fixed prior must use an independent model initialization")
+        prior_hash = sha256(prior_path)
     env, sources = environment(), source_hashes()
     if smoke_steps is None:
-        if not manifest["complete_source_scan"] or config.token_budget < 900_000_000:
-            raise ValueError("Full comparison requires the approximately 1B-token prepared corpus")
-        validate_gate(gate, config, data_hash, prior_hash, env)
-    mesh, replicated, batch_sharding = mesh_and_shardings()
+        if optimizer.phase4:
+            from .sweep_gate import validate_sweep_gate
+            validate_sweep_gate(gate, config, data_hash, prior_hash, env)
+        else:
+            if not manifest["complete_source_scan"] or config.token_budget < 900_000_000:
+                raise ValueError("Full comparison requires the approximately 1B-token prepared corpus")
+            validate_gate(gate, config, data_hash, prior_hash, env)
     if config.global_batch_size % (config.accumulation_steps * jax.device_count()):
         raise ValueError("Each gradient microbatch must divide the global device mesh")
     if config.curvature_batch_size % jax.device_count():
@@ -75,8 +86,9 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     checkpoint_dir = output / "checkpoints"
     if run_path.exists() and not resume:
         raise ValueError("Existing run output: use --resume or a new output directory")
-    step, cursor, tokens, total_hvps, previous_seconds = 0, 0, 0, 0, 0.
+    step, cursor, tokens, total_hvps, previous_seconds, total_sampled_gradients = 0, 0, 0, 0, 0., 0
     recovery, previous_evaluations, previous_compile_seconds = None, [], 0.
+    state_started = time.perf_counter()
     if resume:
         arrays, metadata, recovery = checkpoint.load(checkpoint_dir, config.fingerprint, data_hash, prior_hash, sources)
         if metadata["mode"] != ("smoke" if smoke_steps is not None else "comparison"):
@@ -84,16 +96,19 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
         for key in ("jax", "jaxlib", "backend", "device_kind", "process_count", "local_device_count"):
             if metadata["environment"][key] != env[key]:
                 raise ValueError(f"Checkpoint numerical runtime changed: {key}")
-        if arrays["parameters"].shape != (decoder.parameter_count,) or arrays["basis"].shape != (config.optimizer.cap, decoder.parameter_count):
+        if arrays["parameters"].shape != (decoder.parameter_count,) or arrays["parameters"].dtype != np.float32:
             raise ValueError("Checkpoint tensor shape mismatch")
         parameters = jax.device_put(arrays["parameters"], replicated)
-        state = jax.device_put(TomographyState(arrays["basis"], arrays["inverse"], arrays["count"], arrays["refresh_step"]), replicated)
+        state = optimizer.restore(arrays, metadata)
         step, cursor, tokens = metadata["step"], metadata["cursor"], metadata["tokens"]
         total_hvps, previous_seconds = metadata["total_hvps"], metadata["elapsed_seconds"]
+        total_sampled_gradients = metadata.get("total_sampled_label_gradients", 0)
         previous_evaluations = metadata["evaluations"]
         previous_compile_seconds = metadata.get("compile_seconds", 0.)
         if cursor != step * config.global_batch_size or tokens > config.token_budget:
             raise ValueError("Checkpoint data cursor/token invariant violated")
+        if not optimizer.tomography and int(host_array(state.count)) != step:
+            raise ValueError("Checkpoint optimizer step count differs from the data cursor")
         if log_path.exists():
             rows = [json.loads(line) for line in log_path.read_text().splitlines()]
             with log_path.open("w") as stream:
@@ -102,14 +117,20 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                         stream.write(json.dumps(row, allow_nan=False) + "\n")
     else:
         parameters = jax.device_put(decoder.initialize(config.seed), replicated)
-        state = jax.device_put(empty_state(decoder.parameter_count, config.optimizer.cap), replicated)
-    prior = jax.device_put(np.asarray(frame) if not config.optimizer.adaptive_alignment else np.zeros((1, 1), np.float32), replicated)
+        state = optimizer.empty()
+    jax.block_until_ready((parameters, state))
+    state_seconds = time.perf_counter() - state_started
+    prior = optimizer.put_prior(frame)
     del frame
-    record = {"schema": 1, "mode": "smoke" if smoke_steps is not None else "comparison", "config": config.to_dict(),
+    record = {"schema": 1, "mode": "smoke" if smoke_steps is not None else "comparison", "phase": getattr(config, "phase", 3),
+              "optimizer": optimizer_name(config), "config": config.to_dict(),
               "config_hash": config.fingerprint, "data_hash": data_hash, "prior_hash": prior_hash,
               "source_sha256": sources, "environment": env, "parameter_count": decoder.parameter_count,
               "recovery": recovery, "smoke_step_limit": smoke_steps, "validation_tokens": validation_budget,
-              "rng": "No training randomness: dropout=0; initialization seed and deterministic block permutation fully specify RNG state."}
+              "initialization_or_recovery_seconds": state_seconds,
+              "optimizer_state_global_bytes": sum(math.prod(a.shape) * a.dtype.itemsize for a in jax.tree.leaves(optimizer.state_shapes)),
+              "optimizer_state_placement": "Tomography basis columns sharded; other state replicated" if optimizer.tomography and optimizer.phase4 else "Replicated",
+              "rng": "Dropout=0; initialization and deterministic data permutation use the recorded seeds. Sophia-G sampled labels use a stateless seed+step key."}
     atomic_json(run_path, record)
     requested = [False]
     old_handlers = {}
@@ -118,8 +139,13 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     total_steps = math.ceil(len(train.order) / config.global_batch_size)
     stop_step = total_steps if smoke_steps is None else min(total_steps, smoke_steps)
     gradient_function = jax.jit(make_gradient(decoder, config), in_shardings=(replicated, (batch_sharding,) * 3), out_shardings=replicated)
-    refresh_function = jax.jit(make_refresh(decoder, config), in_shardings=(replicated, replicated, (batch_sharding,) * 3, replicated, replicated), out_shardings=replicated)
-    update_function = jax.jit(make_update(decoder, config), in_shardings=(replicated, replicated, replicated, replicated), out_shardings=replicated, donate_argnums=(0,))
+    refresh_raw = optimizer.refresh_function()
+    refresh_function = None if refresh_raw is None else jax.jit(refresh_raw,
+        in_shardings=(replicated, replicated, (batch_sharding,) * 3, optimizer.prior_sharding, replicated, optimizer.state_sharding),
+        out_shardings=(optimizer.state_sharding, replicated), donate_argnums=(5,))
+    update_function = jax.jit(optimizer.update_function(),
+        in_shardings=(replicated, replicated, optimizer.state_sharding, replicated),
+        out_shardings=(replicated, optimizer.state_sharding, replicated), donate_argnums=(0,) if optimizer.tomography else (0, 2))
     clip_function = jax.jit(lambda g: clip_gradient(g, config.gradient_clip), in_shardings=replicated, out_shardings=replicated)
     eval_function = jax.jit(lambda p, b: decoder.loss_sum(p, b), in_shardings=(replicated, (batch_sharding,) * 3), out_shardings=replicated)
     # Compilations are separate from steady-state timings and do not update the model.
@@ -128,13 +154,15 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     example_gradient = jax.device_put(np.zeros(decoder.parameter_count, np.float32), replicated)
     compilation = {}
     gradient_function, compilation["gradient"] = compile_timed(gradient_function, parameters, first_batch)
-    refresh_function, compilation["refresh"] = compile_timed(refresh_function, parameters, example_gradient, first_curvature, prior, jax.device_put(np.array(step, np.int32), replicated))
+    if refresh_function is not None:
+        refresh_function, compilation["refresh"] = compile_timed(refresh_function, parameters, example_gradient, first_curvature, prior, jax.device_put(np.array(step, np.int32), replicated), state)
     update_function, compilation["update"] = compile_timed(update_function, parameters, example_gradient, state, jax.device_put(np.array(config.learning_rate, np.float32), replicated))
     first_eval = global_batch(validation, 0, config.global_batch_size, batch_sharding)
     eval_function, compilation["validation"] = compile_timed(eval_function, parameters, first_eval)
     record["compilation"] = compilation
     record["startup_seconds"] = time.perf_counter() - startup_started
     atomic_json(run_path, record)
+    del example_gradient, first_batch, first_curvature, first_eval
     started, evaluations, last_saved = time.perf_counter(), previous_evaluations, -1
 
     def evaluate():
@@ -150,6 +178,7 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
             raise ValueError("Validation token budget was not evaluated exactly")
         mean = loss_sum / predicted
         result = {"step": step, "tokens": tokens, "validation_loss": mean, "perplexity": math.exp(mean),
+                  "elapsed_seconds": previous_seconds + time.perf_counter() - started,
                   "validation_tokens": predicted, "seconds": time.perf_counter() - t}
         if not np.isfinite(mean):
             raise FloatingPointError("Nonfinite validation loss")
@@ -161,6 +190,7 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
         sync(f"checkpoint-before-{step}")
         t = time.perf_counter()
         metadata = {"step": step, "cursor": cursor, "tokens": tokens, "total_hvps": total_hvps,
+                    "total_sampled_label_gradients": total_sampled_gradients,
                     "elapsed_seconds": previous_seconds + time.perf_counter() - started,
                     "config_hash": config.fingerprint, "data_hash": data_hash, "prior_hash": prior_hash,
                     "source_sha256": sources, "environment": env, "config": config.to_dict(),
@@ -188,25 +218,26 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                 gradient_seconds = time.perf_counter() - t
                 if not np.isfinite(float(host_array(loss))) or not np.isfinite(float(host_array(gradient_norm))):
                     raise FloatingPointError("Nonfinite loss/gradient; last checkpoint remains intact")
-                refresh = step % config.optimizer.refresh_interval == 0 or int(host_array(state.refresh_step)) < 0
+                refresh = optimizer.should_refresh(step, state)
                 curvature_seconds, acquisition = 0., {"hvp_count": 0, "finite": True}
                 if refresh:
                     curvature = global_batch(train, cursor, config.curvature_batch_size, batch_sharding, config.curvature_sequence_length)
                     t = time.perf_counter()
-                    state, raw = refresh_function(parameters, gradient, curvature, prior, jax.device_put(np.array(step, np.int32), replicated))
+                    state, raw = refresh_function(parameters, gradient, curvature, prior, jax.device_put(np.array(step, np.int32), replicated), state)
                     jax.block_until_ready((state, raw))
                     curvature_seconds = time.perf_counter() - t
                     acquisition = host_stats(raw)
                     if not acquisition["finite"]:
                         raise FloatingPointError("Nonfinite curvature acquisition")
                     total_hvps += acquisition["hvp_count"]
+                    total_sampled_gradients += acquisition.get("sampled_label_gradient_count", 0)
                 t = time.perf_counter()
                 rate = float(learning_rate(step, total_steps, config))
-                parameters, raw_update = update_function(parameters, gradient, state, jax.device_put(np.array(rate, np.float32), replicated))
-                jax.block_until_ready((parameters, raw_update))
+                parameters, state, raw_update = update_function(parameters, gradient, state, jax.device_put(np.array(rate, np.float32), replicated))
+                jax.block_until_ready((parameters, state, raw_update))
                 update_seconds = time.perf_counter() - t
                 update_stats = host_stats(raw_update)
-                if not update_stats["parameters_finite"] or not update_stats["direction_finite_and_descent"]:
+                if not update_stats["parameters_finite"] or (optimizer.tomography and not update_stats["direction_finite_and_descent"]):
                     raise FloatingPointError("Invalid update; recover from last committed checkpoint")
                 # Host count is derived independently from the deterministic permutation.
                 predicted = int(sum(train.batch(cursor, config.global_batch_size)[2].sum(axis=1)))
@@ -216,10 +247,10 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                 row = {"step": step, "tokens": tokens, "predicted_tokens": predicted,
                        "training_loss": float(host_array(loss)), "learning_rate": rate,
                        "gradient_norm": float(host_array(gradient_norm)), "refresh": refresh,
-                       "curvature_age": step - 1 - int(host_array(state.refresh_step)),
+                       "curvature_age": optimizer.age(step - 1, state),
                        "curvature_tokens": int(train.batch(cursor - config.global_batch_size, config.curvature_batch_size, prefix_length=config.curvature_sequence_length)[2].sum()) if refresh else 0,
                        "curvature_positions_processed": config.curvature_batch_size * config.curvature_sequence_length if refresh else 0,
-                       "total_hvps": total_hvps, "data_seconds": data_seconds,
+                       "total_hvps": total_hvps, "total_sampled_label_gradients": total_sampled_gradients, "data_seconds": data_seconds,
                        "gradient_seconds": gradient_seconds, "curvature_seconds": curvature_seconds,
                        "update_seconds": update_seconds, "optimizer_seconds": curvature_seconds + update_seconds,
                        "compute_step_seconds": time.perf_counter() - wall_start,
@@ -241,10 +272,12 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
         if step == total_steps and not complete_budget:
             raise ValueError("Completed block stream did not match exact training token budget")
         elapsed = previous_seconds + time.perf_counter() - started
-        summary = {"schema": 1, "status": status, "mode": record["mode"], "configuration": config.optimizer.configuration,
+        summary = {"schema": 1, "status": status, "mode": record["mode"], "phase": record["phase"],
+                   "optimizer": optimizer_name(config), "configuration": getattr(config.optimizer, "configuration", None),
                    "config_hash": config.fingerprint, "parameter_count": decoder.parameter_count,
                    "step": step, "tokens": tokens, "target_tokens": config.token_budget,
-                   "complete_budget": complete_budget, "total_hvps": total_hvps,
+                   "complete_budget": complete_budget, "total_hvps": total_hvps, "total_sampled_label_gradients": total_sampled_gradients,
+                   "optimizer_state_global_bytes": record["optimizer_state_global_bytes"], "optimizer_state_placement": record["optimizer_state_placement"],
                    "elapsed_seconds": elapsed, "overall_tokens_per_second": tokens / max(elapsed, 1e-30),
                    "compile_seconds": previous_compile_seconds + sum(v["compile_seconds"] for v in compilation.values()),
                    "startup_seconds_this_invocation": record["startup_seconds"],
@@ -256,7 +289,7 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
         return summary
     except BaseException as error:
         atomic_json(output / f"failure-worker-{host_index}.json", {"step": step, "tokens": tokens,
-                    "error": str(error), "traceback": traceback.format_exc(), "mode": record["mode"]})
+                    "error": str(error), "error_type": type(error).__name__, "traceback": traceback.format_exc(), "mode": record["mode"]})
         raise
     finally:
         for signum, handler in old_handlers.items():
@@ -267,7 +300,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
     parser.add_argument("--data", required=True, type=Path)
-    parser.add_argument("--prior", required=True, type=Path)
+    parser.add_argument("--prior", type=Path, help="Required for Phase 3 and fixed-alignment Phase 4 tomography")
     parser.add_argument("--output", required=True, type=Path)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--smoke-steps", type=int)
@@ -283,7 +316,7 @@ def main():
     if args.full_run and args.gate is None:
         parser.error("--full-run requires --gate from completed infrastructure validation")
     initialize(args.distributed, args.coordinator, args.processes, args.process_id)
-    execute(load_config(args.config), args.data, args.prior, args.output, args.smoke_steps, args.gate, args.resume, args.smoke_validation_tokens)
+    execute(load_run_config(args.config), args.data, args.prior, args.output, args.smoke_steps, args.gate, args.resume, args.smoke_validation_tokens)
 
 
 if __name__ == "__main__":

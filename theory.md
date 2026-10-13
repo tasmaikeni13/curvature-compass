@@ -67,3 +67,10 @@ an empirical acquisition heuristic, outside the SPD certification theorem.
 All configurations share BF16 standard XLA training and float32 curvature;
 custom kernels were removed after a ~1.5% algebra gain and attention compile
 failures. See [implementation and measurements](analysis/phase23_results.md).
+
+Phase 3 screening and the Phase 4 596,993,280-parameter sweep infrastructure
+now include AdamW, Muon, SOAP and sampled-label Sophia-G, exact 2,500-step
+trials and three matched seeds per setting. Independent optimizer oracles and
+small-model checkpoint continuation check implementation behavior; they do
+not establish optimizer quality or scale transfer. Full comparison and tuning
+remain unexecuted. See [the registered workflow](analysis/phase34_protocol.md).

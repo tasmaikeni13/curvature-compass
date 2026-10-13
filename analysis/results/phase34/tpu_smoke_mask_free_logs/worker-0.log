@@ -1,0 +1,36 @@
+COMPASS_WORKER_READY
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 2, "compute_step_seconds": 0.23236107200500555}
+{"step": 2, "tokens": 256, "training_loss": 10.836748123168945, "hvp_count": 0, "compute_step_seconds": 0.2009943549928721}
+{"step": 3, "tokens": 384, "training_loss": 10.82460880279541, "hvp_count": 2, "compute_step_seconds": 0.014182098995661363}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 2, "compute_step_seconds": 0.18066090601496398}
+{"step": 2, "tokens": 256, "training_loss": 10.836748123168945, "hvp_count": 0, "compute_step_seconds": 0.1518662279995624}
+{"step": 3, "tokens": 384, "training_loss": 10.82460880279541, "hvp_count": 2, "compute_step_seconds": 0.0431187069916632}
+{"optimizer": "tomography", "smoke_and_bitwise_recovery": "passed"}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.13650555899948813}
+{"step": 2, "tokens": 256, "training_loss": 10.835755348205566, "hvp_count": 0, "compute_step_seconds": 0.008320099004777148}
+{"step": 3, "tokens": 384, "training_loss": 10.822444915771484, "hvp_count": 0, "compute_step_seconds": 0.010049529984826222}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.1414916290086694}
+{"step": 2, "tokens": 256, "training_loss": 10.835755348205566, "hvp_count": 0, "compute_step_seconds": 0.13631843999610282}
+{"step": 3, "tokens": 384, "training_loss": 10.822444915771484, "hvp_count": 0, "compute_step_seconds": 0.010092148993862793}
+{"optimizer": "adamw", "smoke_and_bitwise_recovery": "passed"}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.1440570690028835}
+{"step": 2, "tokens": 256, "training_loss": 10.836780548095703, "hvp_count": 0, "compute_step_seconds": 0.008104779000859708}
+{"step": 3, "tokens": 384, "training_loss": 10.824638366699219, "hvp_count": 0, "compute_step_seconds": 0.00980403900030069}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.13651114900130779}
+{"step": 2, "tokens": 256, "training_loss": 10.836780548095703, "hvp_count": 0, "compute_step_seconds": 0.13461820999509655}
+{"step": 3, "tokens": 384, "training_loss": 10.824638366699219, "hvp_count": 0, "compute_step_seconds": 0.009801899985177442}
+{"optimizer": "muon", "smoke_and_bitwise_recovery": "passed"}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.14869518799241632}
+{"step": 2, "tokens": 256, "training_loss": 10.83681583404541, "hvp_count": 0, "compute_step_seconds": 0.007913839013781399}
+{"step": 3, "tokens": 384, "training_loss": 10.823808670043945, "hvp_count": 0, "compute_step_seconds": 0.009666339989053085}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.13477894000243396}
+{"step": 2, "tokens": 256, "training_loss": 10.83681583404541, "hvp_count": 0, "compute_step_seconds": 0.1522591490065679}
+{"step": 3, "tokens": 384, "training_loss": 10.823808670043945, "hvp_count": 0, "compute_step_seconds": 0.009783029003301635}
+{"optimizer": "soap", "smoke_and_bitwise_recovery": "passed"}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.1503339689807035}
+{"step": 2, "tokens": 256, "training_loss": 10.835739135742188, "hvp_count": 0, "compute_step_seconds": 0.0077150499855633825}
+{"step": 3, "tokens": 384, "training_loss": 10.822135925292969, "hvp_count": 0, "compute_step_seconds": 0.01637982900138013}
+{"step": 1, "tokens": 128, "training_loss": 10.832120895385742, "hvp_count": 0, "compute_step_seconds": 0.1504740189993754}
+{"step": 2, "tokens": 256, "training_loss": 10.835739135742188, "hvp_count": 0, "compute_step_seconds": 0.13490773900412023}
+{"step": 3, "tokens": 384, "training_loss": 10.822135925292969, "hvp_count": 0, "compute_step_seconds": 0.023776778019964695}
+{"optimizer": "sophia_g", "smoke_and_bitwise_recovery": "passed"}

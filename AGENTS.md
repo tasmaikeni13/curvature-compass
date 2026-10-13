@@ -9,6 +9,13 @@ task. `prompt.md` now has five phases: preparation includes execution checks,
 and the full 60M comparison is Phase 3. Historical `phase23` artifacts refer
 to the original preparation and acceleration phases.
 
+Phase 3 result screening and Phase 4 five-optimizer 600M sweep code are prepared
+under `src/curvature_compass/lm/`, with `configs/lm600m_*.json` and the registered
+`analysis/phase34_protocol.md`. Sweeps use 2,500 steps and three matched seeds
+per setting. Small smoke outcomes cannot authorize a full 600M sweep; its
+separate gate consumes actual full-shape smoke/recovery evidence. The user
+owns the comparison, sweep, and main training runs.
+
 ## Implementation
 
 - Language-model code: `src/curvature_compass/lm/`; controlled configs:

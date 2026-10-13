@@ -8,6 +8,32 @@ from .artifacts import atomic_json, sha256
 from .runtime import host_array
 
 
+def encode_index(index, shape):
+    return [list(part.indices(size)) if isinstance(part, slice) else int(part) for part, size in zip(index, shape)]
+
+
+def state_arrays(parameters, state):
+    import jax
+    arrays = {"parameters": host_array(parameters)}
+    if hasattr(state, "basis") and (not isinstance(state.basis, jax.Array) or state.basis.is_fully_replicated):
+        arrays.update({name: host_array(getattr(state, name)) for name in ("basis", "inverse", "count", "refresh_step")})
+        return arrays, {}
+    leaves = jax.tree.leaves(state)
+    sharded = {}
+    for i, leaf in enumerate(leaves):
+        name = f"optimizer_{i:04d}"
+        if isinstance(leaf, jax.Array) and not leaf.is_fully_replicated:
+            pieces = []
+            for j, shard in enumerate(leaf.addressable_shards):
+                key = f"{name}_shard_{j:04d}"
+                arrays[key] = np.asarray(shard.data)
+                pieces.append({"array": key, "index": encode_index(shard.index, leaf.shape)})
+            sharded[name] = {"shape": list(leaf.shape), "dtype": str(leaf.dtype), "shards": pieces}
+        else:
+            arrays[name] = host_array(leaf)
+    return arrays, {"optimizer_state_format": "leaves-v1", "optimizer_leaf_count": len(leaves), "sharded_arrays": sharded}
+
+
 def save(directory, parameters, state, metadata, keep=2):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -16,14 +42,12 @@ def save(directory, parameters, state, metadata, keep=2):
     if temporary.exists():
         shutil.rmtree(temporary)
     temporary.mkdir()
-    arrays = {"parameters": host_array(parameters), "basis": host_array(state.basis),
-              "inverse": host_array(state.inverse), "count": host_array(state.count),
-              "refresh_step": host_array(state.refresh_step)}
+    arrays, layout = state_arrays(parameters, state)
     with (temporary / "state.npz").open("wb") as stream:
         np.savez(stream, **arrays)
         stream.flush()
         os.fsync(stream.fileno())
-    metadata = {**metadata, "schema": 1, "state_sha256": sha256(temporary / "state.npz")}
+    metadata = {**metadata, **layout, "schema": 1, "state_sha256": sha256(temporary / "state.npz")}
     atomic_json(temporary / "manifest.json", metadata)
     if final.exists():
         # Re-saving an interruption at the same completed step is safe only

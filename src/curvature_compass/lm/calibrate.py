@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 import numpy as np
 from .artifacts import atomic_json, environment, sha256, source_hashes
-from .config import load_config
+from .experiments import load_run_config, optimizer_name
 from .data import TokenBlocks, verify_data
 from .model import Decoder
 from .runtime import global_batch, host_array, initialize, mesh_and_shardings, sync
@@ -59,8 +59,10 @@ def load_prior(path, decoder, cap, data_hash=None):
 
 def calibrate(config, data, output, seed=30900, snapshots=16, batch_size=16, sequence_length=128):
     import jax
+    if optimizer_name(config) != "tomography":
+        raise ValueError("Only fixed-alignment tomography uses a calibrated PCA prior")
     decoder = Decoder(config.model)
-    if seed in range(31001, 31005) or seed == config.seed:
+    if seed in range(31001, 31005) or seed in range(41001, 41004) or seed == config.seed:
         raise ValueError("Prior initialization must be independent of the four run seeds")
     manifest = verify_data(data, full=False)
     data_hash = sha256(Path(data) / "manifest.json")
@@ -128,7 +130,7 @@ def main():
     parser.add_argument("--process-id", type=int)
     args = parser.parse_args()
     initialize(args.distributed, args.coordinator, args.processes, args.process_id)
-    calibrate(load_config(args.config), args.data, args.output, args.seed, args.snapshots, args.batch_size, args.sequence_length)
+    calibrate(load_run_config(args.config), args.data, args.output, args.seed, args.snapshots, args.batch_size, args.sequence_length)
 
 
 if __name__ == "__main__":
