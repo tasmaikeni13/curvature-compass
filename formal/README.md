@@ -28,3 +28,9 @@ rank, full-dimensional Schur identities, trust-region convergence, and any
 language-model claim are not Lean theorems in this project. Numerical checks
 are evidence about sampled implementations, not formal proofs. No theorem is
 accepted if the build fails or prints `sorryAx`.
+
+The prepared language-model optimizer uses stochastic, possibly indefinite
+curvature, damping and reduced eigenvalue clipping. Its residual stopping
+policy is heuristic; the Phase 1 SPD certificate does not establish a Newton
+error bound for those runs. No language-model theorem or empirical optimizer
+advantage is claimed by these proofs.

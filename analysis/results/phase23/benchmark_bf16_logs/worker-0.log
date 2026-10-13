@@ -1,0 +1,2 @@
+COMPASS_WORKER_READY
+{"case": "bf16", "status": "passed", "medians": {"gradient_seconds": 0.05352727498393506, "curvature_seconds": 0.6482113110250793, "update_seconds": 0.007304528990061954, "refresh_step_seconds": 0.709083945985185, "cached_step_seconds": 0.06087263496010564, "amortized_step_seconds_estimate": 0.1013858418991731}, "gradient_relative_error": 0.0055019911378622055, "direction_relative_error": 0.005224971566349268}

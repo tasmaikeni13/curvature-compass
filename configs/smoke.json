@@ -1,0 +1,41 @@
+{
+  "accumulation_steps": 1,
+  "attention": "reference",
+  "checkpoint_interval": 2,
+  "compute_dtype": "float32",
+  "curvature_batch_size": 2,
+  "curvature_sequence_length": 8,
+  "data_seed": 32000,
+  "eval_interval": 2,
+  "global_batch_size": 4,
+  "gradient_clip": 1.0,
+  "keep_checkpoints": 2,
+  "learning_rate": 0.05,
+  "minimum_lr_ratio": 0.1,
+  "model": {
+    "heads": 4,
+    "layers": 2,
+    "mlp_width": 128,
+    "padded_vocab_size": 50304,
+    "sequence_length": 16,
+    "vocab_size": 50257,
+    "width": 32
+  },
+  "optimizer": {
+    "cap": 4,
+    "configuration": "D",
+    "damping": 1.0,
+    "eigenvalue_floor": 0.1,
+    "max_step_ratio": 10.0,
+    "min_count": 1,
+    "refresh_interval": 2,
+    "tolerance": 0.7
+  },
+  "rematerialize": false,
+  "reuse_linearization": true,
+  "seed": 31004,
+  "token_budget": 257,
+  "validation_tokens": 64,
+  "warmup_steps": 1,
+  "weight_decay": 0.1
+}

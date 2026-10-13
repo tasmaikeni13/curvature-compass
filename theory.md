@@ -55,3 +55,15 @@ Lean-checked identities and bounds. Read [the full prior-art review](analysis/li
 [registered refinements](analysis/refinement_results.md). The proof scope and
 reproduction commands are in [formal/README.md](formal/README.md) and
 [README.md](README.md).
+
+## Prepared language-model implementation
+
+The 60,957,184-parameter A/B/C/D implementations are now available under
+`src/curvature_compass/lm/`. Preparation and stationary TPU profiling are
+complete; no full language-model training or optimizer winner is claimed.
+For indefinite stochastic curvature the common damped, clipped subspace
+inverse includes a full-space gradient complement. Its stopped residual is
+an empirical acquisition heuristic, outside the SPD certification theorem.
+All configurations share BF16 standard XLA training and float32 curvature;
+custom kernels were removed after a ~1.5% algebra gain and attention compile
+failures. See [implementation and measurements](analysis/phase23_results.md).

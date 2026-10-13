@@ -1,0 +1,4 @@
+COMPASS_WORKER_READY
+2026-10-13 02:47:43.772610: E external/xla/xla/python/profiler/internal/python_hooks.cc:412] Can't import tensorflow.python.profiler.trace
+2026-10-13 02:47:44.626431: E external/xla/xla/python/profiler/internal/python_hooks.cc:412] Can't import tensorflow.python.profiler.trace
+{"case": "reference", "status": "passed", "medians": {"gradient_seconds": 0.09912076199543662, "curvature_seconds": 0.6482641590118874, "update_seconds": 0.007348490005824715, "refresh_step_seconds": 0.7548954009835143, "cached_step_seconds": 0.10646925200126134, "amortized_step_seconds_estimate": 0.14698156137637852}, "gradient_relative_error": 0.0, "direction_relative_error": 0.0}

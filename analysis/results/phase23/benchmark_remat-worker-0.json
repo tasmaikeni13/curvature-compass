@@ -1,0 +1,356 @@
+{
+  "accounting": "Every repetition measures a full refresh and a cached update at fixed parameters. Amortization is a calculated stage-cost estimate, not measured full-run throughput. Compilation, warmup and trace capture excluded from medians. All curvature products remain float32/reference attention.",
+  "acquisition": {
+    "clipped_eigenvalues": 4,
+    "curvature_gradient_norm": 11.479593276977539,
+    "finite": true,
+    "hvp_count": 8,
+    "minimum_damped_eigenvalue": -387.1611328125,
+    "rank_exhausted": false,
+    "residual_ratio": 1468.98583984375,
+    "residual_ratios": [
+      29.096843719482422,
+      1816.575927734375,
+      1565.975830078125,
+      1520.336669921875,
+      1495.67822265625,
+      1481.1070556640625,
+      1470.157470703125,
+      1468.9859619140625
+    ],
+    "stopped_by_policy": false
+  },
+  "baseline_acquisition": {
+    "clipped_eigenvalues": 4,
+    "curvature_gradient_norm": 11.479593276977539,
+    "finite": true,
+    "hvp_count": 8,
+    "minimum_damped_eigenvalue": -387.1047058105469,
+    "rank_exhausted": false,
+    "residual_ratio": 1468.897705078125,
+    "residual_ratios": [
+      28.612777709960938,
+      1816.5491943359375,
+      1565.898681640625,
+      1520.2064208984375,
+      1495.6046142578125,
+      1480.9954833984375,
+      1470.056884765625,
+      1468.8978271484375
+    ],
+    "stopped_by_policy": false
+  },
+  "batch_shape": [
+    64,
+    1024
+  ],
+  "case": "remat",
+  "compilation": {
+    "baseline_gradient": {
+      "compile_seconds": 2.7298858819995075,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 243879936,
+        "estimated_total_bytes": 5269756928,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 243831808,
+        "temp_size_in_bytes": 4782045184
+      }
+    },
+    "baseline_refresh": {
+      "compile_seconds": 6.049280319013633,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 487665152,
+        "estimated_total_bytes": 8192286208,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 1950640128,
+        "temp_size_in_bytes": 5753980928
+      }
+    },
+    "baseline_update": {
+      "compile_seconds": 2.7712186290009413,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 2438296064,
+        "estimated_total_bytes": 2926146048,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 243833344,
+        "temp_size_in_bytes": 244016640
+      }
+    },
+    "candidate_gradient": {
+      "compile_seconds": 36.63004909499432,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 243879936,
+        "estimated_total_bytes": 2030228992,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 243831808,
+        "temp_size_in_bytes": 1542517248
+      }
+    },
+    "candidate_refresh": {
+      "compile_seconds": 91.64179905701894,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 487665152,
+        "estimated_total_bytes": 7823816704,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 1950640128,
+        "temp_size_in_bytes": 5385511424
+      }
+    },
+    "candidate_update": {
+      "compile_seconds": 2.9819807420135476,
+      "memory": {
+        "alias_size_in_bytes": 0,
+        "argument_size_in_bytes": 2438296064,
+        "estimated_total_bytes": 2926146048,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0,
+        "method": "XLA executable memory analysis; not the peak of the entire training process",
+        "output_size_in_bytes": 243833344,
+        "temp_size_in_bytes": 244016640
+      }
+    }
+  },
+  "config": {
+    "accumulation_steps": 1,
+    "attention": "sdpa",
+    "checkpoint_interval": 250,
+    "compute_dtype": "bfloat16",
+    "curvature_batch_size": 16,
+    "curvature_sequence_length": 256,
+    "data_seed": 32000,
+    "eval_interval": 100,
+    "global_batch_size": 64,
+    "gradient_clip": 1.0,
+    "keep_checkpoints": 2,
+    "learning_rate": 0.05,
+    "minimum_lr_ratio": 0.1,
+    "model": {
+      "heads": 8,
+      "layers": 11,
+      "mlp_width": 2048,
+      "padded_vocab_size": 50304,
+      "sequence_length": 1024,
+      "vocab_size": 50257,
+      "width": 512
+    },
+    "optimizer": {
+      "algebra_kernel": "matmul",
+      "cap": 8,
+      "configuration": "B",
+      "damping": 1.0,
+      "eigenvalue_floor": 0.1,
+      "max_step_ratio": 10.0,
+      "min_count": 1,
+      "refresh_interval": 16,
+      "tolerance": 0.7
+    },
+    "rematerialize": true,
+    "reuse_linearization": true,
+    "seed": 31002,
+    "token_budget": 990810689,
+    "validation_tokens": 1048576,
+    "warmup_steps": 200,
+    "weight_decay": 0.1
+  },
+  "configuration": "B",
+  "control_config_hash": "2b00f86e7e099a0656fbfc3a3b952b8947eb871b05be6368aac4bbfd3a6152b5",
+  "curvature_shape": [
+    16,
+    256
+  ],
+  "data_manifest_sha256": "980c93b1f0584abb2e2a62db81b61f3a42b08758d4c42456419b6ed9671cc690",
+  "device_memory_stats": [
+    {
+      "bytes_in_use": 6231361536,
+      "bytes_limit": 33014407168,
+      "bytes_reservable_limit": 32038879232,
+      "bytes_reserved": 4758585344,
+      "largest_alloc_size": 1950629888,
+      "largest_free_block_bytes": 19965419520,
+      "num_allocs": 78,
+      "peak_bytes_in_use": 8669666816,
+      "peak_bytes_reserved": 4758585344
+    },
+    {
+      "bytes_in_use": 6231361536,
+      "bytes_limit": 33014407168,
+      "bytes_reservable_limit": 32282710016,
+      "bytes_reserved": 4758585344,
+      "largest_alloc_size": 1950629888,
+      "largest_free_block_bytes": 20209250304,
+      "num_allocs": 78,
+      "peak_bytes_in_use": 8669666816,
+      "peak_bytes_reserved": 4758585344
+    },
+    {
+      "bytes_in_use": 6231361536,
+      "bytes_limit": 33014407168,
+      "bytes_reservable_limit": 32282710016,
+      "bytes_reserved": 4758585344,
+      "largest_alloc_size": 1950629888,
+      "largest_free_block_bytes": 20209250304,
+      "num_allocs": 78,
+      "peak_bytes_in_use": 8669666816,
+      "peak_bytes_reserved": 4758585344
+    },
+    {
+      "bytes_in_use": 6231361536,
+      "bytes_limit": 33014407168,
+      "bytes_reservable_limit": 32282710016,
+      "bytes_reserved": 4758585344,
+      "largest_alloc_size": 1950629888,
+      "largest_free_block_bytes": 20209250304,
+      "num_allocs": 78,
+      "peak_bytes_in_use": 8669666816,
+      "peak_bytes_reserved": 4758585344
+    }
+  ],
+  "direction_relative_error": 0.005218118894845247,
+  "environment": {
+    "backend": "tpu",
+    "device_kind": "TPU v4",
+    "devices": [
+      "TPU_0(process=0,(0,0,0,0))",
+      "TPU_1(process=0,(1,0,0,0))",
+      "TPU_2(process=0,(0,1,0,0))",
+      "TPU_3(process=0,(1,1,0,0))",
+      "TPU_4(process=1,(0,0,1,0))",
+      "TPU_5(process=1,(1,0,1,0))",
+      "TPU_6(process=1,(0,1,1,0))",
+      "TPU_7(process=1,(1,1,1,0))",
+      "TPU_8(process=2,(0,0,2,0))",
+      "TPU_9(process=2,(1,0,2,0))",
+      "TPU_10(process=2,(0,1,2,0))",
+      "TPU_11(process=2,(1,1,2,0))",
+      "TPU_12(process=3,(0,0,3,0))",
+      "TPU_13(process=3,(1,0,3,0))",
+      "TPU_14(process=3,(0,1,3,0))",
+      "TPU_15(process=3,(1,1,3,0))"
+    ],
+    "git_commit": "c6c9d686e6eb086f65306a1c08c7606f58bb45f3",
+    "jax": "0.6.2",
+    "jaxlib": "0.6.2",
+    "local_device_count": 4,
+    "numpy": "2.2.6",
+    "platform": "Linux-5.19.0-1022-gcp-x86_64-with-glibc2.35",
+    "process_count": 4,
+    "python": "3.10.12",
+    "utc": "2026-10-13T04:50:06.976788+00:00"
+  },
+  "gradient_relative_error": 0.005507159978151321,
+  "loss_absolute_error": 6.198883056640625e-05,
+  "medians": {
+    "amortized_step_seconds_estimate": 0.1096768130610144,
+    "cached_step_seconds": 0.06785539499833249,
+    "curvature_seconds": 0.6691755990032107,
+    "gradient_seconds": 0.060636055015493184,
+    "refresh_step_seconds": 0.7370190539804753,
+    "update_seconds": 0.007219339982839301
+  },
+  "parameter_count": 60957184,
+  "prior_sha256": "af39d7573c1ca60ebfe8647d95cc5c5107276c4296c1fe1a1b96e4a57ca9aaea",
+  "raw": [
+    {
+      "amortized_step_seconds_estimate": 0.10996071233967086,
+      "cached_step_seconds": 0.06811156496405602,
+      "curvature_seconds": 0.6695863580098376,
+      "gradient_seconds": 0.06071511498885229,
+      "hvp_count": 8,
+      "label": "repeat-0",
+      "loss": 10.924054145812988,
+      "refresh_step_seconds": 0.7376979229738936,
+      "update_seconds": 0.007396449975203723
+    },
+    {
+      "amortized_step_seconds_estimate": 0.1096669299149653,
+      "cached_step_seconds": 0.06784345497726463,
+      "curvature_seconds": 0.6691755990032107,
+      "gradient_seconds": 0.06062700497568585,
+      "hvp_count": 8,
+      "label": "repeat-1",
+      "loss": 10.924054145812988,
+      "refresh_step_seconds": 0.7370190539804753,
+      "update_seconds": 0.007216450001578778
+    },
+    {
+      "amortized_step_seconds_estimate": 0.1096768130610144,
+      "cached_step_seconds": 0.06785539499833249,
+      "curvature_seconds": 0.6691426890029106,
+      "gradient_seconds": 0.060636055015493184,
+      "hvp_count": 8,
+      "label": "repeat-2",
+      "loss": 10.924054145812988,
+      "refresh_step_seconds": 0.7369980840012431,
+      "update_seconds": 0.007219339982839301
+    }
+  ],
+  "schema": 1,
+  "source_sha256": {
+    "configs/lm60m_A.json": "8a5864f6571ae205a64e50303b116db3ac0963978d813d5141167f1ba6bf78be",
+    "configs/lm60m_B.json": "04784d899f340e15f1b2abd734fe2ece0912ab4d800c25c2e0d17cc7bbe20f9b",
+    "configs/lm60m_C.json": "cbc1d4069b79c5dbe4e19e5ae108bc07610dd864052559351effadbe59c69a5d",
+    "configs/lm60m_D.json": "e93309293943c399b1186f4c068d5f3a736ccf4397dc218ce5815d16d5f6d289",
+    "configs/smoke.json": "29ebae01ce79edaf1766bc48f765dec7ebaaeff9f669498b3e563069d73daf28",
+    "pyproject.toml": "e1b9495009e73f8f54cc661da2a6c1c97adc54a49d142adcafec377e52ad76cf",
+    "scripts/monitor.py": "49480e13d6b8b22e8b037312b76e19153ecbcecca966edfac65946b13447b5f3",
+    "scripts/pod.py": "d01ffcbdb35a7d89c9f2c92aa3437bcf1056b35a92243b134b0a56a60c57b865",
+    "scripts/pod_worker.py": "a16e601007b19f5750a31e020aa263590f4d5956054d728052bcf8a4ef6cbe2c",
+    "scripts/run_benchmarks.py": "8e7668f19eba4e02bd4df68b25990516eb2ba7cc46e121585cedeb021dcbd933",
+    "src/curvature_compass/lm/__init__.py": "de44cc065859be6a848ef079dbb049f9af21b05a1688cda36a9165fc80886763",
+    "src/curvature_compass/lm/artifacts.py": "75d68d70537337e93ee2c407682ebba5eb39edb438aa652d704fb8093db8ef13",
+    "src/curvature_compass/lm/benchmark.py": "70f1f2db477d2942105d28762ec6fdc70c3232f5e7202f6dc1dcd2a194591e0e",
+    "src/curvature_compass/lm/calibrate.py": "263ab128f2feaab536b70a4f4b9453dfbc94895222dd9e29c302b61beeab111c",
+    "src/curvature_compass/lm/checkpoint.py": "e9adc92ccc69aeb7f8d488b7f9cf232d868dbbcb216c257cb662d73831f3978c",
+    "src/curvature_compass/lm/config.py": "4967675a373db7a3d25ce3a2904fc1716ac6c789df212ec783e97b190bd62956",
+    "src/curvature_compass/lm/data.py": "c2f986f39977891e3770dcb103da9113b434fb3b9c9506e46689a806c9bdec1e",
+    "src/curvature_compass/lm/gate.py": "13346aee30bac352d7820cb4eaf218b9cda63d0cd6e12196a3a3ceb10bbc6db8",
+    "src/curvature_compass/lm/model.py": "fadcb1ea16312bf58cf46680d98cfe5b076bf2e2396f6604b0aadffc4b54a8b5",
+    "src/curvature_compass/lm/numerics.py": "71c7deb7429607ea2d062527c92eb2e3f7819f6210765251b6f9ac349f0a21d1",
+    "src/curvature_compass/lm/optim.py": "65c950d8924fd6fab339f97601d34d361eeb77a9c35e3749f8a8d63c08394441",
+    "src/curvature_compass/lm/probe.py": "01c34c8cb45f1fc97008a73c1c551046452795b2951b14bc5805d8ff9c2ba667",
+    "src/curvature_compass/lm/runtime.py": "b595861af4196f9155799e9787cf8f13d839ebd5a5854eeac245b7be45281edd",
+    "src/curvature_compass/lm/train.py": "322aa484b4e7ce3178ccf919e411249e5cbf974ebd443a57576b8978400edb34",
+    "tests/conftest.py": "3f814551dfe9aadeb490b0360a122f08dee176478ab623070170eed745037ffa",
+    "tests/test_data_and_checkpoint.py": "d4270290d0872a91932582fb835c0e17566e65de3704dc9e708ef0c3a406244b",
+    "tests/test_gate.py": "7d4e267b3c8aa48a26fce6ce01f3108d4db3937e22c580cad85b4e65563936f2",
+    "tests/test_model.py": "e62cc3abb2b5563c6877cc1f0ae25bf821de28526294b0cb056bb488dfd961ca",
+    "tests/test_optim.py": "6b43d89d92f5219ab2791a8a6214f2a0e415e0a9418a9bd33419f1ee1a700863",
+    "tests/test_training.py": "69c2d725509d0089947e3aa0043946410d1a205e5f207a677dbbf49d8d480dd7"
+  },
+  "status": "passed",
+  "total_gradient_batches_executed": 7,
+  "total_hvps_executed": 56,
+  "trace_files": {},
+  "warmup": {
+    "amortized_step_seconds_estimate": 0.14361538701450627,
+    "cached_step_seconds": 0.10179342201445252,
+    "curvature_seconds": 0.66915144000086,
+    "gradient_seconds": 0.06075042500742711,
+    "hvp_count": 8,
+    "label": "warmup",
+    "loss": 10.924054145812988,
+    "refresh_step_seconds": 0.7709448620153125,
+    "update_seconds": 0.041042997007025406
+  }
+}

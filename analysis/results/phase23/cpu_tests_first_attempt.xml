@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="24" time="51.235" timestamp="2026-10-13T02:30:09.268557+00:00" hostname="t1v-n-79750f9f-w-0"><testcase classname="tests.test_data_and_checkpoint" name="test_token_blocks_exact_budget_no_replacement_and_resume_cursor" time="0.007" /><testcase classname="tests.test_data_and_checkpoint" name="test_data_hash_and_document_split_integrity" time="0.010" /><testcase classname="tests.test_data_and_checkpoint" name="test_frozen_pca_frame_and_layout_integrity" time="0.005" /><testcase classname="tests.test_data_and_checkpoint" name="test_atomic_checkpoint_rollback_and_experiment_binding" time="0.016" /><testcase classname="tests.test_data_and_checkpoint" name="test_four_configs_preserve_controls_and_independent_initializations" time="0.001" /><testcase classname="tests.test_model" name="test_parameter_count_initialization_tying_and_padding" time="1.471" /><testcase classname="tests.test_model" name="test_causal_attention_and_shifted_loss" time="1.449" /><testcase classname="tests.test_model" name="test_hvp_finite_difference_and_linearity" time="2.362" /><testcase classname="tests.test_model" name="test_sdpa_rematerialization_and_accumulation_preserve_derivatives" time="16.142" /><testcase classname="tests.test_model" name="test_linearization_reuse_matches_recomputed_hvps" time="8.458" /><testcase classname="tests.test_optim" name="test_quadratic_matches_independent_projected_dense_inverse[A]" time="0.787" /><testcase classname="tests.test_optim" name="test_quadratic_matches_independent_projected_dense_inverse[B]" time="0.162" /><testcase classname="tests.test_optim" name="test_quadratic_matches_independent_projected_dense_inverse[C]" time="0.168" /><testcase classname="tests.test_optim" name="test_quadratic_matches_independent_projected_dense_inverse[D]" time="0.165" /><testcase classname="tests.test_optim" name="test_adaptive_count_executes_one_query_without_hidden_suffix" time="0.476"><failure message="assert (2 == 1)&#10; +  where 2 = int(Array(2, dtype=int32))&#10; +    where Array(2, dtype=int32) = TomographyState(basis=Array([[ 0.18257418,  0.36514837,  0.5477225 ,  0.73029673],\n       [-0.11952286, -0.23904572,  ... 0.        , 0.        , 1.        ]], dtype=float32), count=Array(2, dtype=int32), refresh_step=Array(0, dtype=int32)).count">def test_adaptive_count_executes_one_query_without_hidden_suffix():
+        config = OptimizerConfig(configuration="D", cap=4)
+        gradient = jnp.array([1., 2., 3., 4.])
+        state, stats = acquire(lambda v: v, gradient, jnp.eye(4), config)
+        assert int(state.count) == 1
+        assert bool(stats["stopped_by_policy"])
+        assert np.count_nonzero(np.asarray(state.basis).any(axis=1)) == 1
+        # Fixed count stops on an exhausted invariant subspace, not this policy.
+        state, stats = acquire(lambda v: v, gradient, jnp.eye(4), replace(config, configuration="B"))
+&gt;       assert int(state.count) == 1 and bool(stats["rank_exhausted"])
+E       assert (2 == 1)
+E        +  where 2 = int(Array(2, dtype=int32))
+E        +    where Array(2, dtype=int32) = TomographyState(basis=Array([[ 0.18257418,  0.36514837,  0.5477225 ,  0.73029673],\n       [-0.11952286, -0.23904572,  ... 0.        , 0.        , 1.        ]], dtype=float32), count=Array(2, dtype=int32), refresh_step=Array(0, dtype=int32)).count
+
+tests/test_optim.py:41: AssertionError</failure></testcase><testcase classname="tests.test_optim" name="test_fixed_frames_share_prefix_and_do_not_depend_on_current_gradient" time="0.481" /><testcase classname="tests.test_optim" name="test_indefinite_clipping_descent_norm_cap_and_zero_gradient" time="0.500" /><testcase classname="tests.test_optim" name="test_nonfinite_hvp_is_detected" time="0.134" /><testcase classname="tests.test_training" name="test_bitwise_resumed_training_and_exact_partial_final_budget" time="8.037" /><testcase classname="tests.test_training" name="test_all_cells_execute_real_model_hvps_and_cached_updates[A]" time="2.354"><failure message="AssertionError: assert ('finished' == 'finished'&#10;  &#10;    finished and 25 == 32)">tmp_path = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo0')
+fixture_data = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo0/data')
+cell = 'A'
+
+    @pytest.mark.parametrize("cell", list("ABCD"))
+    def test_all_cells_execute_real_model_hvps_and_cached_updates(tmp_path, fixture_data, cell):
+        config, prior = controls_and_prior(tmp_path, fixture_data, cell)
+        summary = execute(config, fixture_data, prior, tmp_path / cell, smoke_steps=2)
+&gt;       assert summary["status"] == "finished" and summary["tokens"] == 32
+E       AssertionError: assert ('finished' == 'finished'
+E
+E           finished and 25 == 32)
+
+tests/test_training.py:54: AssertionError</failure></testcase><testcase classname="tests.test_training" name="test_all_cells_execute_real_model_hvps_and_cached_updates[B]" time="2.483"><failure message="AssertionError: assert ('finished' == 'finished'&#10;  &#10;    finished and 25 == 32)">tmp_path = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo1')
+fixture_data = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo1/data')
+cell = 'B'
+
+    @pytest.mark.parametrize("cell", list("ABCD"))
+    def test_all_cells_execute_real_model_hvps_and_cached_updates(tmp_path, fixture_data, cell):
+        config, prior = controls_and_prior(tmp_path, fixture_data, cell)
+        summary = execute(config, fixture_data, prior, tmp_path / cell, smoke_steps=2)
+&gt;       assert summary["status"] == "finished" and summary["tokens"] == 32
+E       AssertionError: assert ('finished' == 'finished'
+E
+E           finished and 25 == 32)
+
+tests/test_training.py:54: AssertionError</failure></testcase><testcase classname="tests.test_training" name="test_all_cells_execute_real_model_hvps_and_cached_updates[C]" time="2.434"><failure message="AssertionError: assert ('finished' == 'finished'&#10;  &#10;    finished and 25 == 32)">tmp_path = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo2')
+fixture_data = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo2/data')
+cell = 'C'
+
+    @pytest.mark.parametrize("cell", list("ABCD"))
+    def test_all_cells_execute_real_model_hvps_and_cached_updates(tmp_path, fixture_data, cell):
+        config, prior = controls_and_prior(tmp_path, fixture_data, cell)
+        summary = execute(config, fixture_data, prior, tmp_path / cell, smoke_steps=2)
+&gt;       assert summary["status"] == "finished" and summary["tokens"] == 32
+E       AssertionError: assert ('finished' == 'finished'
+E
+E           finished and 25 == 32)
+
+tests/test_training.py:54: AssertionError</failure></testcase><testcase classname="tests.test_training" name="test_all_cells_execute_real_model_hvps_and_cached_updates[D]" time="2.634"><failure message="AssertionError: assert ('finished' == 'finished'&#10;  &#10;    finished and 25 == 32)">tmp_path = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo3')
+fixture_data = PosixPath('/tmp/pytest-of-tasma/pytest-21/test_all_cells_execute_real_mo3/data')
+cell = 'D'
+
+    @pytest.mark.parametrize("cell", list("ABCD"))
+    def test_all_cells_execute_real_model_hvps_and_cached_updates(tmp_path, fixture_data, cell):
+        config, prior = controls_and_prior(tmp_path, fixture_data, cell)
+        summary = execute(config, fixture_data, prior, tmp_path / cell, smoke_steps=2)
+&gt;       assert summary["status"] == "finished" and summary["tokens"] == 32
+E       AssertionError: assert ('finished' == 'finished'
+E
+E           finished and 25 == 32)
+
+tests/test_training.py:54: AssertionError</failure></testcase><testcase classname="tests.test_training" name="test_full_run_and_smoke_bound_guard" time="0.075" /></testsuite></testsuites>

@@ -1,0 +1,47 @@
+COMPASS_WORKER_READY
+jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/benchmark.py", line 172, in <module>
+    main()
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/benchmark.py", line 168, in main
+    benchmark(load_config(args.config), args.data, args.prior, args.output, args.case, args.repeats, args.profile)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/benchmark.py", line 76, in benchmark
+    grad, compilation["candidate_gradient"] = compile_timed(grad, parameters, batch)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/train.py", line 35, in compile_timed
+    compiled = function.lower(*args).compile()
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/optim.py", line 148, in <lambda>
+    return jax.value_and_grad(lambda p, batch: decoder.training_loss(
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/model.py", line 119, in training_loss
+    return self.loss(flat, batch, **execution)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/model.py", line 114, in loss
+    total, count = self.loss_sum(flat, batch, **execution)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/model.py", line 108, in loss_sum
+    logits = self.logits(flat, x, **execution)
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/model.py", line 101, in logits
+    x = execute(x, {name[len(prefix):]: value for name, value in p.items() if name.startswith(prefix)})
+  File "/home/tasma/curvature-compass/src/curvature_compass/lm/model.py", line 85, in block
+    value = jax.vmap(splash)(scaled_q, k.transpose(0, 2, 1, 3).astype(dtype), v.transpose(0, 2, 1, 3).astype(dtype)).transpose(0, 2, 1, 3).astype(flat.dtype)
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/experimental/pallas/ops/tpu/splash_attention/splash_attention_kernel.py", line 2347, in __call__
+    return _splash_attention(
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/experimental/pallas/ops/tpu/splash_attention/splash_attention_kernel.py", line 2312, in _splash_attention
+    return _splash_attention_custom(
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/experimental/pallas/ops/tpu/splash_attention/splash_attention_kernel.py", line 1192, in _splash_attention_custom
+    return _splash_attention_forward(  # pytype: disable=wrong-arg-types
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/experimental/pallas/ops/tpu/splash_attention/splash_attention_kernel.py", line 1100, in _splash_attention_forward
+    all_out = pl.pallas_call(
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/_src/pallas/pallas_call.py", line 1715, in wrapped
+    jaxpr, consts = _trace_kernel_to_jaxpr(
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/_src/pallas/pallas_call.py", line 1210, in _trace_kernel_to_jaxpr
+    jaxpr, _, consts, () = pe.trace_to_jaxpr_dynamic(wrapped_kernel_fun,
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/_src/pallas/primitives.py", line 874, in wrap_with_transforms
+    return f(*new_args)
+  File "/home/tasma/curvature-compass/.venv/lib/python3.10/site-packages/jax/experimental/pallas/ops/tpu/splash_attention/splash_attention_kernel.py", line 716, in flash_attention_kernel
+    raise NotImplementedError(
+NotImplementedError: head_dim_v=64 should be a multiple of 128

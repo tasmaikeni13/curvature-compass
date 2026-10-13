@@ -1,0 +1,2 @@
+COMPASS_WORKER_READY
+{"case": "algebra", "status": "passed", "medians": {"gradient_seconds": 0.09932453298824839, "curvature_seconds": 0.6365680310118478, "update_seconds": 0.007490998978028074, "refresh_step_seconds": 0.7434047140122857, "cached_step_seconds": 0.10684982300153933, "amortized_step_seconds_estimate": 0.14663450368971098}, "gradient_relative_error": 0.0, "direction_relative_error": 2.1717096387874335e-05}

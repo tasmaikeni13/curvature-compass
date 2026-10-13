@@ -1,0 +1,16 @@
+[w2] COMPASS_WORKER_READY
+[w1] COMPASS_WORKER_READY
+[w3] COMPASS_WORKER_READY
+[w0] COMPASS_WORKER_READY
+Pod job remains live (31s)
+Pod job remains live (61s)
+Pod job remains live (91s)
+Pod job remains live (121s)
+Pod job remains live (151s)
+Pod job remains live (181s)
+Pod job remains live (211s)
+Pod job remains live (241s)
+[w0] {"case": "bf16", "status": "passed", "medians": {"gradient_seconds": 0.05352727498393506, "curvature_seconds": 0.6482113110250793, "update_seconds": 0.007304528990061954, "refresh_step_seconds": 0.709083945985185, "cached_step_seconds": 0.06087263496010564, "amortized_step_seconds_estimate": 0.1013858418991731}, "gradient_relative_error": 0.0055019911378622055, "direction_relative_error": 0.005224971566349268}
+[w3] fatal: not a git repository (or any of the parent directories): .git
+[w2] fatal: not a git repository (or any of the parent directories): .git
+[w1] fatal: not a git repository (or any of the parent directories): .git

@@ -1,0 +1,26 @@
+{
+  "case": "bf16",
+  "command": [
+    "/usr/bin/python",
+    "scripts/pod.py",
+    "--logs",
+    "analysis/results/phase23/benchmark_bf16_logs",
+    "--timeout",
+    "900",
+    "curvature_compass.lm.benchmark",
+    "--config",
+    "configs/lm60m_B.json",
+    "--data",
+    "data/fineweb",
+    "--prior",
+    "artifacts/lm60m_prior.npy",
+    "--output",
+    "analysis/results/phase23/benchmark_bf16.json",
+    "--case",
+    "bf16",
+    "--repeats",
+    "3"
+  ],
+  "exit_code": 0,
+  "launcher_seconds": 256.76884089701343
+}

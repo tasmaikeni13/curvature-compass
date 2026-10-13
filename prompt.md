@@ -271,7 +271,7 @@ Design the architecture, tokenizer handling, preprocessing, sequence constructio
 
 Keep the model and data conditions as equivalent as possible across the four optimizers.
 
-Prepare reliable training, validation, checkpointing, logging, recovery, and monitoring infrastructure.
+Prepare reliable training, validation, checkpointing, logging, recovery, and monitoring infrastructure. Profile representative workloads on the available hardware, record model and optimizer costs, and validate numerical correctness and performance before launching the full comparisons.
 
 Capture all optimizer-specific computational overhead.
 
@@ -283,41 +283,11 @@ Select implementation details and tools independently, guided by the experimenta
 
 Small correctness checks and infrastructure tests are acceptable.
 
-The full training runs must not begin until Phase 3 is completed and validated.
+The full training runs must not begin until the training infrastructure has passed its correctness, recovery, and performance checks.
 
 ---
 
-# PHASE 3 — Computational Optimization and Acceleration
-
-Optimize the entire experimental system for efficient, reliable execution.
-
-Investigate applicable acceleration techniques, specialized kernels, attention optimizations, memory-efficiency improvements, and computational refinements.
-
-The agent has autonomy to select the most suitable approaches according to the hardware, architecture, workloads, and measured bottlenecks.
-
-Do not apply optimizations merely because they are fashionable or theoretically faster.
-
-Profile actual workloads, identify dominant costs, and improve them.
-
-Pay special attention to the computational overhead introduced by curvature measurements, directional adaptation, optimizer state, and repeated information acquisition.
-
-Optimize both model execution and optimizer execution.
-
-Benchmark each important improvement against an appropriate reference.
-
-Verify numerical correctness, stability, and compatibility after changes.
-
-Quantify speed, memory, and correctness tradeoffs.
-
-Reject optimizations that introduce unacceptable numerical errors, invalidate experimental comparisons, or provide no meaningful end-to-end benefit.
-
-Iterate until the resulting execution system is sufficiently efficient, stable, and validated for the planned research runs.
-
-**Do not begin Phase 4 training until this phase has passed its correctness and performance checks.**
-
----
-
-# PHASE 4 — Initial 60M Language Model Comparison
+# PHASE 3 — Initial 60M Language Model Comparison
 
 Run the first substantial language-model experiment.
 
@@ -332,7 +302,7 @@ Each model receives approximately **1 billion FineWeb-Edu training tokens**.
 
 Use **one seed per configuration** for this exploratory comparison.
 
-Use the validated accelerated training system developed in Phase 3.
+Use the validated training infrastructure developed in Phase 2. Prefer standard XLA execution; retain specialized kernels only when measured end-to-end speed improves and numerical correctness is preserved.
 
 Ensure comparable architecture, training data, token budgets, evaluation conditions, and experimental controls.
 
@@ -357,9 +327,9 @@ Perform detailed ablations and analyze the effect of count adaptation, alignment
 
 Use the results to select **one winning tomography optimizer** for the next phase.
 
-Define and justify the selection criterion before examining the final Phase 4 results.
+Define and justify the selection criterion before examining the final Phase 3 results.
 
-Recognize that one seed provides limited statistical evidence. Treat Phase 4 as exploratory screening, not definitive proof of superiority.
+Recognize that one seed provides limited statistical evidence. Treat Phase 3 as exploratory screening, not definitive proof of superiority.
 
 Preserve all results, including unfavorable findings.
 
@@ -367,13 +337,13 @@ Update `analysis`, `formal`, and `theory.md` wherever the experiments change our
 
 ---
 
-# PHASE 5 — 600M Hyperparameter Sweeps and Selection
+# PHASE 4 — 600M Hyperparameter Sweeps and Selection
 
 This phase is dedicated to rigorous hyperparameter tuning.
 
 The competitors are:
 
-1. The winning adaptive Hessian tomography optimizer from Phase 4.
+1. The winning adaptive Hessian tomography optimizer from Phase 3.
 2. AdamW.
 3. Muon.
 4. SOAP.
@@ -407,17 +377,17 @@ Investigate interactions between hyperparameters, computational overhead, stabil
 
 Record the tuning process comprehensively, including unsuccessful trials and the resources consumed.
 
-At the end of Phase 5, select and freeze the strongest defensible hyperparameter configurations for the five optimizers.
+At the end of Phase 4, select and freeze the strongest defensible hyperparameter configurations for the five optimizers.
 
-These configurations become the basis of Phase 6.
+These configurations become the basis of Phase 5.
 
 The 600M sweep is intentionally a different scale from the final 125M experiment. Explicitly investigate whether tuning decisions transfer reliably across those scales; do not assume they do.
 
-Do not use Phase 6 outcomes to retroactively select Phase 5 hyperparameters.
+Do not use Phase 5 outcomes to retroactively select Phase 4 hyperparameters.
 
 ---
 
-# PHASE 6 — Final 125M Language Model Study
+# PHASE 5 — Final 125M Language Model Study
 
 Conduct the final controlled comparison between the winning tomography optimizer and the four established competitors.
 
@@ -439,7 +409,7 @@ Conduct the final controlled comparison between the winning tomography optimizer
 
 This produces **15 main training runs**.
 
-Use the tuned configurations established in Phase 5, subject only to clearly documented, predeclared scale-transfer rules.
+Use the tuned configurations established in Phase 4, subject only to clearly documented, predeclared scale-transfer rules.
 
 Train all models under matched data, architecture, evaluation, and relevant training conditions.
 
@@ -578,9 +548,9 @@ The project is complete only when the research has produced:
 5. A concise and consistently updated `theory.md`.
 6. Reproducible Phase 1 analysis and simulation evidence.
 7. Tested and optimized language-model training infrastructure.
-8. Completed Phase 4 exploratory comparisons across four configurations.
-9. Completed Phase 5 hyperparameter searches across the five competitors.
-10. Completed Phase 6 final comparisons, with reliable evaluation across three seeds.
+8. Completed Phase 3 exploratory comparisons across four configurations.
+9. Completed Phase 4 hyperparameter searches across the five competitors.
+10. Completed Phase 5 final comparisons, with reliable evaluation across three seeds.
 11. An evidence-based understanding of when adaptive Hessian tomography helps, when it fails, and whether it offers an advantage over existing optimization methods.
 
 Do not prioritize producing a positive result over producing a correct result.

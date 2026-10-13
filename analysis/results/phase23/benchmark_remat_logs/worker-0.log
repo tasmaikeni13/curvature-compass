@@ -1,0 +1,2 @@
+COMPASS_WORKER_READY
+{"case": "remat", "status": "passed", "medians": {"gradient_seconds": 0.060636055015493184, "curvature_seconds": 0.6691755990032107, "update_seconds": 0.007219339982839301, "refresh_step_seconds": 0.7370190539804753, "cached_step_seconds": 0.06785539499833249, "amortized_step_seconds_estimate": 0.1096768130610144}, "gradient_relative_error": 0.005507159978151321, "direction_relative_error": 0.005218118894845247}

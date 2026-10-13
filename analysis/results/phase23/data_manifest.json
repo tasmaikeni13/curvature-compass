@@ -1,0 +1,121 @@
+{
+  "complete_source_scan": true,
+  "dataset": "codelion/fineweb-edu-1B",
+  "dataset_revision": "66b78cd134ab7b0545a1a618a1cc029f3091eb20",
+  "documents_after_deduplication": {
+    "calibration": 4972,
+    "train": 960557,
+    "validation": 4868
+  },
+  "dtype": "<u2",
+  "duplicate_documents": 0,
+  "eos_id": 50256,
+  "files": {
+    "calibration.bin": {
+      "bytes": 1048578,
+      "sha256": "e90add15664ce424d4c3a3c6bb2e241257ef95f57a6aa9ed67f714d901c38151"
+    },
+    "calibration.documents.sha256": {
+      "bytes": 17984,
+      "sha256": "64ead6c43ca2793ea062e6c5b2a13910ac562acf06746235666680ecd75b02c3"
+    },
+    "train.bin": {
+      "bytes": 1981621380,
+      "sha256": "a156966e2ba8b4710cf5694c7af27fe7f3ee58e4c7687e6f81ada503f81213aa"
+    },
+    "train.documents.sha256": {
+      "bytes": 30737824,
+      "sha256": "1a5676ac61511c4cd6b17ea8eb203c9f3f3f9a854483e6a2087c3283c31dc73b"
+    },
+    "validation.bin": {
+      "bytes": 2097154,
+      "sha256": "a6c831358cc787d365663a01ab3ffc9da01a19acb86978567531602b539e0ce5"
+    },
+    "validation.documents.sha256": {
+      "bytes": 34176,
+      "sha256": "836db4e0a489b96df441a296a09fb62153e0f34ee94050cea0ab3a81a28e97b0"
+    }
+  },
+  "max_documents": null,
+  "observed_tokens": {
+    "calibration": 5136464,
+    "train": 990810690,
+    "validation": 5023388
+  },
+  "packing": "Continuous exact-text BPE with one EOS per document, shifted next-token targets; no BOS; block contexts may cross document boundaries.",
+  "predicted_tokens": {
+    "calibration": 524288,
+    "train": 990810689,
+    "validation": 1048576
+  },
+  "rows_read": 970397,
+  "schema": 1,
+  "seconds": 638.4326597369945,
+  "sources": [
+    {
+      "bytes": 276706977,
+      "name": "data/train-00000-of-00010.parquet",
+      "sha256": "0325361551a5030a112c41a7aa3ef6a204b8cdc4ac165bfc38aaf6c3e55e8903"
+    },
+    {
+      "bytes": 273217832,
+      "name": "data/train-00001-of-00010.parquet",
+      "sha256": "0bcb47ce49f21e868bd242ffc0f8dd97acf8a53f661e6726b8a8b236fadfda09"
+    },
+    {
+      "bytes": 272322892,
+      "name": "data/train-00002-of-00010.parquet",
+      "sha256": "06926b82e3d78a2a08a4cd9600f56a90d4f70081cf14117a707c6c8472b2f21e"
+    },
+    {
+      "bytes": 277502321,
+      "name": "data/train-00003-of-00010.parquet",
+      "sha256": "3ba65d71e5dcf3c258fbc7fcce0c05f809ec7c143658721c6c818255426d9e35"
+    },
+    {
+      "bytes": 276093637,
+      "name": "data/train-00004-of-00010.parquet",
+      "sha256": "b3bd5ca95129f314509cf84cf6cb5666da75039222e6cc2d06b7d687e2b4f86a"
+    },
+    {
+      "bytes": 274264694,
+      "name": "data/train-00005-of-00010.parquet",
+      "sha256": "96f22e3983dd5ccdcd7371794bc7a49511683e3430cc5e916d27596a22944190"
+    },
+    {
+      "bytes": 275373229,
+      "name": "data/train-00006-of-00010.parquet",
+      "sha256": "1172141a4219d63d7153e4d3e54e5db2e195bc098097f38626eddbe60695c7ea"
+    },
+    {
+      "bytes": 272924127,
+      "name": "data/train-00007-of-00010.parquet",
+      "sha256": "1237f512bc898e9a08aaa3094b229a11022f694e8f9d5a835401d3d31681729c"
+    },
+    {
+      "bytes": 274187682,
+      "name": "data/train-00008-of-00010.parquet",
+      "sha256": "8395fec5c599b8872b557b0452db4f483dec8910a7d937626d84888e6dfc05d8"
+    },
+    {
+      "bytes": 279431897,
+      "name": "data/train-00009-of-00010.parquet",
+      "sha256": "0d432bf9f0709f8d89bb9fd56aaf106a0ffedd356e85bbbe10b3e12bafc5fa9b"
+    }
+  ],
+  "split_salt": "curvature-compass-phase23-v1\u0000",
+  "stored_tokens": {
+    "calibration": 524289,
+    "train": 990810690,
+    "validation": 1048577
+  },
+  "target_predicted_tokens": {
+    "calibration": 524288,
+    "train": 1000000000,
+    "validation": 1048576
+  },
+  "tokenizer": "openai-community/gpt2",
+  "tokenizer_revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+  "tokenizer_sha256": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+  "vocab_size": 50257
+}

@@ -5,9 +5,23 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "curvature-compass"
 version = "0.1.0"
-description = "Phase 1 synthetic research on optimization-relevant directional curvature"
+description = "Directional curvature research and controlled TPU language-model infrastructure"
 requires-python = ">=3.10"
 dependencies = ["numpy==2.2.6", "scipy==1.15.3", "matplotlib==3.10.7"]
 
+[project.optional-dependencies]
+lm = ["jax==0.6.2", "jaxlib==0.6.2", "tokenizers==0.23.3", "huggingface-hub==2.2.0", "pyarrow==25.0.1", "psutil==7.2.2"]
+tpu = ["libtpu==0.0.17", "requests>=2.29"]
+test = ["pytest==9.1.1"]
+
+[project.scripts]
+compass-data = "curvature_compass.lm.data:main"
+compass-train = "curvature_compass.lm.train:main"
+compass-calibrate = "curvature_compass.lm.calibrate:main"
+compass-benchmark = "curvature_compass.lm.benchmark:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

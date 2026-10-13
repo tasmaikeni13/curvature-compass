@@ -7,3 +7,8 @@ src/*.egg-info/
 formal/.lake/
 analysis/literature/cache/
 *.tmp
+data/
+runs/
+artifacts/
+.jax_cache/
+*.prof

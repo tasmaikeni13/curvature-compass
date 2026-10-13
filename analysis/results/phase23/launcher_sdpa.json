@@ -1,0 +1,26 @@
+{
+  "case": "sdpa",
+  "command": [
+    "/usr/bin/python",
+    "scripts/pod.py",
+    "--logs",
+    "analysis/results/phase23/benchmark_sdpa_logs",
+    "--timeout",
+    "900",
+    "curvature_compass.lm.benchmark",
+    "--config",
+    "configs/lm60m_B.json",
+    "--data",
+    "data/fineweb",
+    "--prior",
+    "artifacts/lm60m_prior.npy",
+    "--output",
+    "analysis/results/phase23/benchmark_sdpa.json",
+    "--case",
+    "sdpa",
+    "--repeats",
+    "3"
+  ],
+  "exit_code": 0,
+  "launcher_seconds": 255.66668561199913
+}

@@ -1,0 +1,2 @@
+COMPASS_WORKER_READY
+{"case": "sdpa", "status": "passed", "medians": {"gradient_seconds": 0.05260075500700623, "curvature_seconds": 0.6480807710031513, "update_seconds": 0.007279868994373828, "refresh_step_seconds": 0.7079613950045314, "cached_step_seconds": 0.059880624001380056, "amortized_step_seconds_estimate": 0.10038567218907701}, "gradient_relative_error": 0.0055019911378622055, "direction_relative_error": 0.005224946886301041}

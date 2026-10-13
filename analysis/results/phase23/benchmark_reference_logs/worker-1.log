@@ -1,0 +1,4 @@
+COMPASS_WORKER_READY
+2026-10-13 02:47:43.772513: E external/xla/xla/python/profiler/internal/python_hooks.cc:412] Can't import tensorflow.python.profiler.trace
+2026-10-13 02:47:44.626346: E external/xla/xla/python/profiler/internal/python_hooks.cc:412] Can't import tensorflow.python.profiler.trace
+fatal: not a git repository (or any of the parent directories): .git
