@@ -1,167 +1,176 @@
 # Curvature Compass
 
-Research on directional curvature acquisition, with a completed Phase 1
-foundation and prepared A/B/C/D language-model implementations. The common
-decoder has 60,957,184 parameters and a frozen 990,810,689-token FineWeb-Edu
-budget. Preparation and actual v4-32 stationary benchmarks are complete;
-full training is left to the user. Phase 3 screening and the Phase 4 five-optimizer
-600M sweep implementations are also prepared. `prompt.md` now has five phases, with the
-standalone kernel phase removed and later phases renumbered.
+Curvature Compass is a modern JAX/XLA research framework for second-order and
+adaptive optimization on deep transformer architectures, targeting Google Cloud
+TPU Pod hardware (v4-32) with pure JAX CPU compatibility for development and
+testing.
 
-The current conclusions and open question are in [`theory.md`](theory.md).
-The registered design is [`analysis/protocol.md`](analysis/protocol.md); primary
-literature annotations and search limits are in
-[`analysis/literature_review.md`](analysis/literature_review.md). Results,
-including failed assumptions and independent follow-up cycles, are in
-[`analysis/monte_carlo.md`](analysis/monte_carlo.md),
-[`analysis/refinement_results.md`](analysis/refinement_results.md), and the
-other notes under `analysis/`. Lean theorem scope and limitations are listed
-in [`formal/README.md`](formal/README.md).
+The framework benchmarks adaptive directional curvature acquisition (Hessian
+tomography) alongside established first- and second-order optimizers on a modern
+LLaMA-style autoregressive language model.
 
-## 60M implementation and launch
+## Key Features
 
-Use **standard XLA**, BF16 training products, float32 curvature/state, reused
-HVP linearization and reference attention. The reduction algebra prototype
-improved refresh time only ~1.5%; it and the failed Splash attention path were
-deleted. BF16 reduced measured refresh time from 0.755s to 0.709s. Read
-[`analysis/phase23_results.md`](analysis/phase23_results.md) for measurements,
-limits, validation and the preserved failures. No optimizer winner is inferred.
+- **Modern LLaMA Architecture**: Decoder-only transformer implementing RMSNorm
+  (no learnable bias), Rotary Position Embeddings (RoPE), SwiGLU feed-forward
+  networks, 100% bias-free linear projections, and tied token embeddings.
+- **Canonical 32k Tokenizer**: Integration with `hf-internal-testing/llama-tokenizer`
+  (32,000 un-gated vocabulary padded to 32,768 for TPU matrix unit alignment,
+  BOS=1, EOS=2).
+- **High-Performance Attention**: Custom FlashAttention kernel implemented in
+  `jax.experimental.pallas` targeting TPU v4, with automatic fallback to
+  reference attention (`jax.nn.dot_product_attention`) under CPU environments.
+- **Pure JAX/XLA Optimizers**: Complete implementations of AdamW, Muon (with
+  auxiliary AdamW), SOAP, Sophia-G, and Tomography—strictly using standard
+  JAX/XLA operations with zero custom Pallas kernels in optimizer code.
+- **125M Parameter Benchmark Model**: Controlled 124,275,456-parameter
+  configuration tuned for 2.5B FineWeb-Edu tokens across 5 matched seeds.
+- **600M Token Hyperparameter Sweeps**: Systematic tuning pipeline allocating a
+  600M FineWeb-Edu token budget per optimizer across matched initialization and
+  data-order seeds.
+- **Bounded Smoke Tests**: Instant verification (`--smoke-steps`) validating
+  parameter initialization, parameter counts, gradient flow, and loss descent.
+- **Formal Verification**: 15 machine-checked theorems in Lean 4 verifying
+  curvature bounds, subspace optimality, and information-theoretic limits.
 
-On worker 0 of the existing four-host v4-32 pod, the prepared dataset is
-`data/fineweb/` and the independent rank-eight prior is
-`artifacts/lm60m_prior.npy` with its adjacent JSON manifest. Both are already
-copied to workers 1–3. These large artifacts are excluded from Git. Every
-worker must use identical source, configs, evidence, data and prior bytes.
+## Model Specifications
 
+| Parameter | 125M LLaMA Model Configuration |
+|---|---|
+| Total Parameters | 124,275,456 (~124.28M) |
+| Layers ($L$) | 12 |
+| Model Dimension ($d$) | 768 |
+| Attention Heads | 12 (head dimension $d_k = 64$) |
+| FFN Intermediate Dimension | 2,560 (SwiGLU, ratio $\approx 3.33 \times d$) |
+| Vocabulary Size | 32,000 (padded to 32,768 for TPU alignment) |
+| Context Sequence Length | 1,024 |
+| Positional Embedding | RoPE ($\theta = 10,000.0$) |
+| Normalization | RMSNorm ($\epsilon = 10^{-5}$, zero bias) |
+| Linear Projections | 100% bias-free |
+| Weight Tying | Token embeddings tied to output projection logits |
+
+## Optimizers Under Benchmark
+
+1. **AdamW**: Standard decoupled weight decay adaptive optimizer.
+2. **Muon**: Matrix update optimizer using Newton-Schulz iterations on 2D hidden
+   weights, with auxiliary AdamW for 1D vectors (RMSNorm scales and embeddings).
+3. **SOAP**: Second-order optimizer preconditioning gradients with empirical
+   covariance eigenspaces.
+4. **Sophia-G**: Second-order optimizer using stochastic diagonal Hessian
+   estimates with elementwise clipping.
+5. **Tomography**: Directional curvature framework adaptively selecting
+   Hessian-vector product measurement vectors via Krylov subspace expansion and
+   damped subspace inversion.
+
+All optimizers are implemented strictly in standard JAX/XLA operations without
+custom Pallas kernels.
+
+## Quickstart & Verification
+
+### Environment Setup
+The project runs under Python 3.10 with JAX and standard dependencies:
 ```sh
-python -m pip install -e '.[lm,tpu,test]'
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 JAX_PLATFORMS=cpu python -m pytest -q --junitxml=analysis/results/phase23/cpu_tests.xml
-JAX_PLATFORMS=cpu python analysis/phase23_audit.py
+pip install -e '.[lm,tpu,test]'
 ```
 
-The audit regenerates the preparation gate after verifying the pinned data,
-prior and recorded checks. Full training additionally validates that the
-source, controls, inputs, evidence and runtime match that gate. Changing
-experimental controls requires renewed validation. The committed
-`requirements-lm-lock.txt` records the isolated LM environment.
-
-Synchronize the finished implementation and evidence to the existing workers:
-
+### Running the Test Suite (CPU)
+Run the unit test suite on CPU:
 ```sh
-for host in w1 w2 w3; do
-  rsync -azR --exclude='__pycache__' src configs scripts tests pyproject.toml \
-    analysis/phase23_audit.py analysis/phase23_protocol.md \
-    analysis/results/phase23 "$host:$PWD/"
-done
+PYTHONPATH=src OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 JAX_PLATFORMS=cpu /home/tasma/venv/bin/python -m pytest -q
 ```
 
-When you choose to train, launch one configuration at a time, substituting
-`A`, `B`, `C` or `D` consistently. This command is provided for the user; it
-was **not executed** during preparation:
-
+### Bounded Smoke Tests
+Verify initialization, gradient computation, parameter counts, and multi-step
+loss descent without running full training:
 ```sh
-.venv/bin/python scripts/pod.py --timeout 86400 --logs runs/A/launcher \
-  curvature_compass.lm.train --config configs/lm60m_A.json \
-  --data data/fineweb --prior artifacts/lm60m_prior.npy --output runs/A \
-  --full-run --gate analysis/results/phase23/gate.json
-.venv/bin/python scripts/monitor.py runs/A --watch
+PYTHONPATH=src JAX_PLATFORMS=cpu /home/tasma/venv/bin/python -m curvature_compass.lm.train \
+  --config configs/lm125m_adamw.json --smoke-steps 3
 ```
 
-Add `--resume` to the same training command to recover from the latest intact
-compatible checkpoint. The launcher coordinates `w0`–`w3` via the existing
-SSH aliases and refuses busy workers. Training logs token counts, real HVP
-counts, gradient/acquisition/update costs, evaluations, memory and checkpoint
-costs per worker. Checkpoints bind source/data/prior/config and retain two
-atomic generations. SIGTERM requests a synchronized checkpoint.
+## Experimental Pipelines
 
-For a fresh machine, recreate the prepared inputs before validation:
-
+### 1. 600M Token Hyperparameter Sweeps
+Systematic tuning across hyperparameter configurations with a 600M FineWeb-Edu
+token budget per optimizer:
 ```sh
-JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.data data/fineweb
-OPENBLAS_NUM_THREADS=16 OMP_NUM_THREADS=16 JAX_PLATFORMS=cpu \
-  .venv/bin/python -m curvature_compass.lm.calibrate \
-  --config configs/lm60m_A.json --data data/fineweb \
-  --output artifacts/lm60m_prior.npy
+# Generate the deterministic sweep plan
+PYTHONPATH=src JAX_PLATFORMS=cpu /home/tasma/venv/bin/python -m curvature_compass.lm.sweep plan \
+  --output runs/sweep-plan
 ```
 
-Copy the same prepared inputs to every worker. Regenerate validation evidence
-and the gate for a different runtime or corpus. Small CPU fixtures and actual
-TPU derivative checks are separate from full-size stationary timing; no full
-60M multi-step training or full-size recovery run is claimed.
-
-## Phase 3 selection and Phase 4 sweeps
-
-The five `configs/lm600m_*.json` templates use **596,993,280 parameters**,
-standard JAX/XLA, BF16 training and float32 state/curvature. The sweep implements
-the actual Phase 3 tomography winner, AdamW, Muon with auxiliary AdamW, SOAP,
-and sampled-label Sophia-G. The tomography template's D cell is provisional;
-the generator replaces it with the evidence-backed Phase 3 selection.
-
-After your 60M runs finish, these commands inspect/generate artifacts without
-starting training:
-
+### 2. 125M / 2.5B Token Training Pipeline
+Full comparative training of all five optimizers on 2.5 billion tokens across 5
+matched seeds (`51001` through `51005`):
 ```sh
-JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.compare \
-  --runs runs/A runs/B runs/C runs/D --output runs/phase3-selection.json
-JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.sweep plan \
-  --winner runs/phase3-selection.json --output runs/phase4-plan
-JAX_PLATFORMS=cpu .venv/bin/python -m curvature_compass.lm.sweep_gate requirements \
-  --plan runs/phase4-plan/plan.json
+# Launch bounded smoke verification on a specific optimizer config
+PYTHONPATH=src JAX_PLATFORMS=cpu /home/tasma/venv/bin/python -m curvature_compass.lm.train \
+  --config configs/lm125m_muon.json --smoke-steps 5
 ```
 
-Defaults are **24 settings × 5 optimizers × 3 seeds = 360 trials**, each exactly
-**2,500 steps / 163,840,000 predicted tokens**. The registered plan varies
-hyperparameters jointly, includes default candidates, matches initialization
-and data-order seed pairs, and freezes controls before execution. Reports
-retain failed trials, tuning costs, seed variability and quality/time frontiers.
-
-Read [the protocol](analysis/phase34_protocol.md),
-[the smoke results and limits](analysis/phase34_results.md), and
-[the launch/recovery guide](analysis/phase34_launch.md). Bounded tiny-model
-checks establish implementation behavior. Before your sweep, its separate
-gate requires actual 600M-shape smoke/recovery evidence; the 60M preparation
-gate cannot authorize the new scale. Full comparisons and sweeps were left
-unexecuted for you.
-
-## Phase 1 reproduction
-
-The recorded environment uses Python 3.10.12 with pinned NumPy, SciPy, and
-Matplotlib in `pyproject.toml`, and Lean 4.34.1 with Mathlib v4.34.1. See
-[`analysis/environment.md`](analysis/environment.md) for host details and
-`requirements-lock.txt` for the Python package snapshot. The published
-compressed outcomes have source and data hashes in matching manifest files.
-Local literature PDFs and extracted full texts are excluded; their source
-links, reading locators, retrieval hashes, and download script are retained.
-
-From the repository root, recreate the Python environment and primary studies:
-
+### TPU Pod Distributed Execution
+This workspace is worker 0 of a Google Cloud TPU v4-32 pod (`w0`–`w3`).
+Multi-worker jobs are coordinated via `scripts/pod.py` with cooperative worker
+locks:
 ```sh
-python -m venv .venv
-. .venv/bin/activate
-python -m pip install -e .
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m curvature_compass.checks
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m curvature_compass.study calibration --workers 8
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m curvature_compass.study evaluation --workers 8
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m curvature_compass.report
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m curvature_compass.refinements all
-python analysis/audit_artifacts.py
+/home/tasma/venv/bin/python scripts/pod.py --timeout 86400 --logs runs/adamw/launcher \
+  curvature_compass.lm.train --config configs/lm125m_adamw.json \
+  --data data/fineweb --output runs/adamw --smoke-steps 5
 ```
 
-`checks` verifies numerical invariants; primary calibration freezes the
-candidate quartet before held-out evaluation. Refinements use new seed ranges
-registered in `analysis/refinement_protocol.md`. To rebuild the proof artifact,
-install Lean through elan and run `cd formal && lake build`. Regenerating study
-outputs overwrites files under `analysis/results`; the checked-in records are
-the outcomes analyzed in the report. The artifact audit verifies recorded raw
-and source hashes, row counts, paper inventory, and Lean proof log without
-rerunning any experiment; its completed coverage record is
-[`analysis/completion_audit.md`](analysis/completion_audit.md).
+## Theoretical Foundations & Formal Verification
 
-## Reading map
+The mathematical theory of directional curvature estimation is documented in
+[`theory.md`](theory.md). Supporting mathematical derivations and synthetic
+simulations are archived in `analysis/`.
 
-* `src/curvature_compass/core.py`: operators, generators, acquisition, and CG.
-* `study.py` and `report.py`: registered primary simulation and aggregation.
-* `refinements.py`: separate noise, drift, nonconvex, iterative, scalar, and
-  scaling follow-ups.
-* `analysis/results/`: compressed raw records, manifests, summaries, and figure.
-* `formal/CurvatureCompass.lean`: verified identities, bounds, and examples.
+The Lean 4 formalization resides in [`formal/`](formal/):
+```sh
+cd formal && lake build
+```
+The build validates 15 proved results covering quadratic gap bounds, subspace
+optimality, residual perturbation bounds, and information-theoretic scalar
+blindness under Lean's foundational axioms (`propext`, `Classical.choice`,
+`Quot.sound`) with zero `sorryAx`.
+
+## Repository Structure
+
+```
+├── configs/
+│   ├── lm125m_adamw.json       # 125M config for AdamW (2.5B token budget)
+│   ├── lm125m_muon.json        # 125M config for Muon
+│   ├── lm125m_soap.json        # 125M config for SOAP
+│   ├── lm125m_sophia_g.json    # 125M config for Sophia-G
+│   ├── lm125m_tomography.json  # 125M config for Tomography
+│   └── smoke.json              # Small model config for fast CI checks
+├── formal/
+│   ├── CurvatureCompass.lean   # Lean 4 formal verification ledger
+│   └── README.md               # Proof documentation and axiom scope
+├── scripts/
+│   ├── monitor.py              # Training progress and throughput monitor
+│   ├── pod.py                  # TPU pod coordinator with worker locks
+│   ├── pod_worker.py           # Worker execution wrapper
+│   └── run_benchmarks.py       # Benchmark test runner
+├── src/curvature_compass/
+│   ├── lm/
+│   │   ├── attention.py        # Pallas FlashAttention kernel & CPU fallback
+│   │   ├── compare.py          # Multi-optimizer comparison runner
+│   │   ├── competitors.py      # Pure JAX AdamW, Muon, SOAP, Sophia-G
+│   │   ├── config.py           # ModelConfig (125M) and RunConfig
+│   │   ├── data.py             # 32k LLaMA tokenizer & FineWeb-Edu pipeline
+│   │   ├── execution.py        # SPMD device sharding and compilation
+│   │   ├── model.py            # Modern LLaMA decoder (RMSNorm, RoPE, SwiGLU)
+│   │   ├── optim.py            # Pure JAX Tomography optimizer
+│   │   ├── sweep.py            # 600M token sweep planner and runner
+│   │   └── train.py            # Training runner with bounded smoke tests
+│   ├── core.py                 # Foundational curvature operators & CG
+│   ├── report.py               # Statistical evaluation and figures
+│   └── study.py                # Synthetic Monte Carlo simulation framework
+└── tests/
+    ├── test_attention.py       # FlashAttention numerical parity tests
+    ├── test_baseline_training.py # Training loop and checkpoint recovery
+    ├── test_competitors.py     # Pure JAX optimizer correctness tests
+    ├── test_data.py            # Tokenizer batching and split salt tests
+    ├── test_model.py           # 125M architecture and parameter count tests
+    ├── test_sweep.py           # Sweep plan validation and selection tests
+    └── test_train.py           # Bounded smoke and training execution tests
+```

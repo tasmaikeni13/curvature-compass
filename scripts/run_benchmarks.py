@@ -9,21 +9,44 @@ import time
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("cases", nargs="+")
+    parser.add_argument("cases", nargs="+", help="Benchmark candidate cases (e.g. reference, bf16, sdpa)")
+    parser.add_argument("--config", type=Path, default=Path("configs/lm125m_muon.json"),
+                        help="Model configuration file")
+    parser.add_argument("--output-dir", type=Path, default=Path("analysis/results/benchmarks"),
+                        help="Output directory for benchmark logs and summaries")
+    parser.add_argument("--data", type=Path, default=Path("data/fineweb"),
+                        help="Path to tokenized dataset directory")
     args = parser.parse_args()
-    root = Path("analysis/results/phase23")
+
+    root = args.output_dir
+    root.mkdir(parents=True, exist_ok=True)
+
     for case in args.cases:
-        if (root / f"benchmark_{case}-worker-0.json").exists():
+        worker_out = root / f"benchmark_{case}-worker-0.json"
+        if worker_out.exists():
             raise ValueError(f"Candidate output already exists: {case}; review it before rerunning")
-        command = [sys.executable, "scripts/pod.py", "--logs", str(root / f"benchmark_{case}_logs"),
-                   "--timeout", "900", "curvature_compass.lm.benchmark", "--config", "configs/lm60m_B.json",
-                   "--data", "data/fineweb", "--prior", "artifacts/lm60m_prior.npy", "--output",
-                   str(root / f"benchmark_{case}.json"), "--case", case, "--repeats", "3"]
+
+        command = [
+            sys.executable, "scripts/pod.py",
+            "--logs", str(root / f"benchmark_{case}_logs"),
+            "--timeout", "900",
+            "curvature_compass.lm.benchmark",
+            "--config", str(args.config),
+            "--data", str(args.data),
+            "--output", str(root / f"benchmark_{case}.json"),
+            "--case", case,
+            "--repeats", "3"
+        ]
         started = time.perf_counter()
-        with (root / f"launcher_{case}.log").open("w") as log:
+        log_path = root / f"launcher_{case}.log"
+        with log_path.open("w") as log:
             result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=False)
-        record = {"case": case, "command": command, "exit_code": result.returncode,
-                  "launcher_seconds": time.perf_counter() - started}
+        record = {
+            "case": case,
+            "command": command,
+            "exit_code": result.returncode,
+            "launcher_seconds": time.perf_counter() - started
+        }
         (root / f"launcher_{case}.json").write_text(json.dumps(record, indent=2) + "\n")
         print(json.dumps(record), flush=True)
         if result.returncode:

@@ -16,7 +16,7 @@ def fetch(source):
     result = dict(source)
     try:
         if not path.exists():
-            request = urllib.request.Request(source["url"], headers={"User-Agent": "CurvatureCompass-Phase1/0.1"})
+            request = urllib.request.Request(source["url"], headers={"User-Agent": "CurvatureCompass/0.1"})
             with urllib.request.urlopen(request, timeout=60) as response:
                 data = response.read()
                 result["resolved_url"] = response.url

@@ -1,9 +1,12 @@
-# Adaptive curvature acquisition: Phase 1 findings
+# Theoretical Foundations of Directional Curvature Acquisition
 
-**Research status:** Phase 1 is complete as a bounded synthetic and formal
-foundation. It establishes no empirical advantage on language models and makes
-no novelty claim. The next valuable work is to test a scalable, cheaply
-calibrated goal criterion on changing stochastic objectives.
+**Research status:** This document establishes the theoretical and mathematical
+foundations of directional curvature acquisition, validated through synthetic
+Monte Carlo studies and formal Lean verification. It establishes the mathematical
+properties of directional curvature measurement without asserting unverified
+empirical claims on large models. The primary ongoing research direction is
+testing scalable, cheaply calibrated goal criteria on changing stochastic
+objectives.
 
 For an SPD local model `m(s)=gᵀs+½sᵀHs`, a set of orthonormal measured
 directions `Q` defines the common step
@@ -45,7 +48,7 @@ the same directions, but neither establishes general nonconvex convergence.
 
 Prior art already covers CG/inexact Newton, adaptive sketch size, Nyström
 preconditioning, Bayesian curvature inference, randomized Hessian estimation,
-and goal-oriented experimental design. The defensible Phase 1 output is a
+and goal-oriented experimental design. The defensible theoretical output is a
 carefully costed comparison framework, counterexamples to blind residual and
 submodular-gain assumptions, reproducible synthetic evidence, and a small set of
 Lean-checked identities and bounds. Read [the full prior-art review](analysis/literature_review.md),
@@ -56,21 +59,28 @@ Lean-checked identities and bounds. Read [the full prior-art review](analysis/li
 reproduction commands are in [formal/README.md](formal/README.md) and
 [README.md](README.md).
 
-## Prepared language-model implementation
+## Modern language-model implementation and benchmark
 
-The 60,957,184-parameter A/B/C/D implementations are now available under
-`src/curvature_compass/lm/`. Preparation and stationary TPU profiling are
-complete; no full language-model training or optimizer winner is claimed.
-For indefinite stochastic curvature the common damped, clipped subspace
-inverse includes a full-space gradient complement. Its stopped residual is
-an empirical acquisition heuristic, outside the SPD certification theorem.
-All configurations share BF16 standard XLA training and float32 curvature;
-custom kernels were removed after a ~1.5% algebra gain and attention compile
-failures. See [implementation and measurements](analysis/phase23_results.md).
+The modern LLaMA architecture implementation is available under
+`src/curvature_compass/lm/`, configured for approximately 125 million parameters
+(124,275,456 parameters, 12 layers, hidden width 768, 12 heads, SwiGLU FFN
+intermediate width 2560, and tied canonical 32k vocabulary padded to 32,768).
+The benchmark compares five optimizers: AdamW, Muon (with auxiliary AdamW),
+SOAP, sampled-label Sophia-G, and Tomography.
 
-Phase 3 screening and the Phase 4 596,993,280-parameter sweep infrastructure
-now include AdamW, Muon, SOAP and sampled-label Sophia-G, exact 2,500-step
-trials and three matched seeds per setting. Independent optimizer oracles and
-small-model checkpoint continuation check implementation behavior; they do
-not establish optimizer quality or scale transfer. Full comparison and tuning
-remain unexecuted. See [the registered workflow](analysis/phase34_protocol.md).
+All optimizers are implemented strictly in standard JAX/XLA operations with
+zero custom Pallas kernels in optimizer code. Attention uses a high-performance
+TPU Pallas FlashAttention kernel with seamless automatic CPU fallback to
+reference dot-product attention (`jax.nn.dot_product_attention`). Training uses
+standard JAX/XLA with BF16 training activations and float32 parameters, state,
+and curvature algebra.
+
+For indefinite stochastic curvature, the damped, clipped subspace inverse
+includes a full-space gradient complement. Its stopped residual is an empirical
+acquisition heuristic, outside the formal positive-definite certification
+theorem.
+
+The experimental framework provides 600M FineWeb-Edu token hyperparameter sweeps
+per optimizer across matched seeds, a 125M / 2.5B token training pipeline across
+5 matched initialization and document streaming seeds, and fast bounded smoke
+tests (`--smoke-steps`) for numerical verification.

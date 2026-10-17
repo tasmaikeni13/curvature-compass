@@ -1,4 +1,4 @@
-# Held-out Phase 1 Monte Carlo results
+# Held-out Monte Carlo results
 
 The quartet was frozen in commit `6b44ca9` using 24 calibration seeds. The
 held-out set has 64 root seeds and 6,144 problem instances. Candidate policies

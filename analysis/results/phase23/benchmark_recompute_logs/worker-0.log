@@ -1,2 +1,0 @@
-COMPASS_WORKER_READY
-{"case": "recompute", "status": "passed", "medians": {"gradient_seconds": 0.05251117600710131, "curvature_seconds": 0.6799177279754076, "update_seconds": 0.007207200018456206, "refresh_step_seconds": 0.7396877839928493, "cached_step_seconds": 0.059754814981715754, "amortized_step_seconds_estimate": 0.10224341179491603}, "gradient_relative_error": 0.0055019911378622055, "direction_relative_error": 0.005224952008575201}

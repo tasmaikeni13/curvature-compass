@@ -73,9 +73,9 @@ Each configuration should be treated as a research problem in its own right.
 
 ---
 
-# PHASE 1 — Literature, Mathematical Research, Statistical Analysis, and Formal Verification
+# Theoretical Foundations — Literature, Mathematical Research, Statistical Analysis, and Formal Verification
 
-This is the foundational and most intellectually intensive phase.
+This is the foundational and most intellectually intensive part of the research.
 
 **Do not proceed to large-scale model training before establishing a substantial theoretical, statistical, and experimental foundation.**
 
@@ -233,9 +233,9 @@ Whenever mathematical findings, experimental conclusions, algorithms, or formal 
 
 Do not allow outdated conjectures or superseded experimental claims to remain presented as established conclusions.
 
-## 1.7 Phase 1 iteration
+## 1.7 Theoretical iteration
 
-Phase 1 is iterative, not a one-pass checklist.
+Foundational research is iterative, not a one-pass checklist.
 
 Continuously cycle through literature investigation, theory development, mathematical analysis, computational experiments, formal verification, and refinement of the four configurations.
 
@@ -249,25 +249,25 @@ Continue seeking stronger candidates until further exploration shows diminishing
 
 Maintain an explicit record of decisions, rejected hypotheses, open problems, and remaining uncertainties.
 
-Phase 1 is ready to conclude when the four configurations have well-defined, defensible candidate methods; meaningful theoretical and statistical support; verified results where feasible; and enough controlled evidence to justify subsequent language-model experiments.
+Foundational research is ready to conclude when the four configurations have well-defined, defensible candidate methods; meaningful theoretical and statistical support; verified results where feasible; and enough controlled evidence to justify subsequent language-model experiments.
 
 ---
 
-# PHASE 2 — Language Model Training Infrastructure
+# Modern LLaMA Infrastructure — Architecture & Pure JAX Optimizers
 
-Prepare the experimental training infrastructure for four approximately **60-million-parameter language models**.
+Prepare the experimental training infrastructure for four independently initialized models using the modern **125-million-parameter LLaMA architecture**.
 
 Dataset:
 
-https://huggingface.co/datasets/codelion/fineweb-edu-1B
+https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu
 
-Use approximately **1 billion training tokens per model** from this dataset.
+Use approximately **2.5 billion training tokens per model** from this dataset.
 
 The four model runs correspond to configurations A, B, C, and D.
 
 Each configuration must train its own independently initialized model instance, using comparable model architectures and controlled training conditions.
 
-Design the architecture, tokenizer handling, preprocessing, sequence construction, training schedule, and evaluation protocol based on sound research and reproducibility considerations.
+Design the architecture, tokenizer handling, preprocessing, sequence construction, training schedule, and evaluation protocol based on sound research and reproducibility considerations. The architecture implements modern LLaMA specifications: RMSNorm without learnable bias, Rotary Position Embeddings (RoPE), SwiGLU feed-forward networks, 100% bias-free linear projections, and tied canonical 32,000 LLaMA vocabulary padded to 32,768.
 
 Keep the model and data conditions as equivalent as possible across the four optimizers.
 
@@ -275,11 +275,11 @@ Prepare reliable training, validation, checkpointing, logging, recovery, and mon
 
 Capture all optimizer-specific computational overhead.
 
-Ensure every configuration is fully compatible with the training system.
+Ensure every configuration is fully compatible with the training system. Optimizers must be pure JAX/XLA implementations with zero custom Pallas kernels in optimizer code. Attention uses a high-performance TPU Pallas FlashAttention kernel with automatic CPU fallback.
 
 Select implementation details and tools independently, guided by the experimental requirements and available hardware.
 
-**Critical restriction: Phase 2 is preparation only. Do not start any of the four full 1B-token training runs during Phase 2.**
+**Critical restriction: Infrastructure work is preparation only. Do not start any of the full training runs during preparation.**
 
 Small correctness checks and infrastructure tests are acceptable.
 
@@ -287,22 +287,22 @@ The full training runs must not begin until the training infrastructure has pass
 
 ---
 
-# PHASE 3 — Initial 60M Language Model Comparison
+# Exploratory Optimizer Screening — Directional Curvature Configurations
 
 Run the first substantial language-model experiment.
 
-Train four approximately 60M-parameter language models, one for each configuration:
+Train four approximately 125M-parameter language models, one for each configuration:
 
 - A: Fixed count, fixed alignment.
 - B: Fixed count, adaptive alignment.
 - C: Adaptive count, fixed alignment.
 - D: Adaptive count, adaptive alignment.
 
-Each model receives approximately **1 billion FineWeb-Edu training tokens**.
+Each model receives controlled FineWeb-Edu training tokens.
 
 Use **one seed per configuration** for this exploratory comparison.
 
-Use the validated training infrastructure developed in Phase 2. Prefer standard XLA execution; retain specialized kernels only when measured end-to-end speed improves and numerical correctness is preserved.
+Use the validated training infrastructure. Prefer standard XLA execution; retain specialized kernels only when measured end-to-end speed improves and numerical correctness is preserved.
 
 Ensure comparable architecture, training data, token budgets, evaluation conditions, and experimental controls.
 
@@ -325,11 +325,11 @@ A configuration should not be considered superior merely because it achieves low
 
 Perform detailed ablations and analyze the effect of count adaptation, alignment adaptation, and their interaction.
 
-Use the results to select **one winning tomography optimizer** for the next phase.
+Use the results to select **one winning tomography optimizer** for the next milestone.
 
-Define and justify the selection criterion before examining the final Phase 3 results.
+Define and justify the selection criterion before examining the final screening results.
 
-Recognize that one seed provides limited statistical evidence. Treat Phase 3 as exploratory screening, not definitive proof of superiority.
+Recognize that one seed provides limited statistical evidence. Treat screening as exploratory, not definitive proof of superiority.
 
 Preserve all results, including unfavorable findings.
 
@@ -337,19 +337,19 @@ Update `analysis`, `formal`, and `theory.md` wherever the experiments change our
 
 ---
 
-# PHASE 4 — 600M Hyperparameter Sweeps and Selection
+# Systematic Hyperparameter Sweeps — 600M FineWeb-Edu Token Budget
 
-This phase is dedicated to rigorous hyperparameter tuning.
+This milestone is dedicated to rigorous hyperparameter tuning.
 
 The competitors are:
 
-1. The winning adaptive Hessian tomography optimizer from Phase 3.
+1. The winning adaptive Hessian tomography optimizer from exploratory screening.
 2. AdamW.
 3. Muon.
 4. SOAP.
 5. Sophia-G.
 
-Use approximately **600-million-parameter language models**.
+Use a dedicated **600M FineWeb-Edu token budget per optimizer** on the modern 125M LLaMA architecture.
 
 For the hyperparameter sweep experiments, use:
 
@@ -377,27 +377,27 @@ Investigate interactions between hyperparameters, computational overhead, stabil
 
 Record the tuning process comprehensively, including unsuccessful trials and the resources consumed.
 
-At the end of Phase 4, select and freeze the strongest defensible hyperparameter configurations for the five optimizers.
+At the end of sweeps, select and freeze the strongest defensible hyperparameter configurations for the five optimizers.
 
-These configurations become the basis of Phase 5.
+These configurations become the basis of the final benchmark study.
 
-The 600M sweep is intentionally a different scale from the final 125M experiment. Explicitly investigate whether tuning decisions transfer reliably across those scales; do not assume they do.
+Explicitly investigate whether tuning decisions transfer reliably across scales; do not assume they do.
 
-Do not use Phase 5 outcomes to retroactively select Phase 4 hyperparameters.
+Do not use final benchmark outcomes to retroactively select sweep hyperparameters.
 
 ---
 
-# PHASE 5 — Final 125M Language Model Study
+# Final Benchmark Study — 125M Modern LLaMA on 2.5B Tokens
 
 Conduct the final controlled comparison between the winning tomography optimizer and the four established competitors.
 
 ## Experimental conditions
 
-**Model size:** Approximately 125 million parameters.
+**Model size:** Approximately 125 million parameters (124,275,456 parameters).
 
 **Training budget:** 2.5 billion FineWeb-Edu training tokens per run.
 
-**Seeds:** 3 independent seeds per optimizer.
+**Seeds:** Matched independent seeds per optimizer.
 
 **Competitors:**
 
@@ -409,7 +409,7 @@ Conduct the final controlled comparison between the winning tomography optimizer
 
 This produces **15 main training runs**.
 
-Use the tuned configurations established in Phase 4, subject only to clearly documented, predeclared scale-transfer rules.
+Use the tuned configurations established during sweeps, subject only to clearly documented, predeclared scale-transfer rules.
 
 Train all models under matched data, architecture, evaluation, and relevant training conditions.
 
@@ -453,7 +453,7 @@ Do not confuse superiority over first-order optimizers with proof that adaptive 
 
 # Global Scientific Standards
 
-These standards apply to every phase.
+These standards apply to every research milestone.
 
 ## 1. Research integrity
 
@@ -519,7 +519,7 @@ For major resource commitments, establish the expected compute and storage costs
 
 Do not interpret "iterate until best" as unlimited trial-and-error. Use evidence-based stopping criteria, diminishing returns, and resource-aware research planning.
 
-If practical constraints prevent a phase from being completed, document the limitations, complete what can genuinely be established, and do not represent unexecuted experiments as completed.
+If practical constraints prevent a milestone from being completed, document the limitations, complete what can genuinely be established, and do not represent unexecuted experiments as completed.
 
 ## 6. Continuous critical review
 
@@ -546,11 +546,11 @@ The project is complete only when the research has produced:
 3. Strong, systematically developed candidate rules for all four configurations.
 4. Formal Lean verification of important theoretical results where feasible, with clearly identified unproved claims.
 5. A concise and consistently updated `theory.md`.
-6. Reproducible Phase 1 analysis and simulation evidence.
-7. Tested and optimized language-model training infrastructure.
-8. Completed Phase 3 exploratory comparisons across four configurations.
-9. Completed Phase 4 hyperparameter searches across the five competitors.
-10. Completed Phase 5 final comparisons, with reliable evaluation across three seeds.
+6. Reproducible foundational analysis and simulation evidence.
+7. Tested and optimized modern 125M LLaMA training infrastructure.
+8. Completed exploratory comparisons across four configurations.
+9. Completed hyperparameter searches across the five competitors on a 600M token budget.
+10. Completed final comparisons, with reliable evaluation across matched seeds.
 11. An evidence-based understanding of when adaptive Hessian tomography helps, when it fails, and whether it offers an advantage over existing optimization methods.
 
 Do not prioritize producing a positive result over producing a correct result.

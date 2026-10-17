@@ -12,3 +12,5 @@ runs/
 artifacts/
 .jax_cache/
 *.prof
+.agents/
+tests/fixtures/

@@ -13,7 +13,7 @@ from curvature_compass.lm.config import ModelConfig, RunConfig
 from curvature_compass.lm.train import execute
 
 
-def test_phase4_tensor_decay_matches_independent_dense_mask_rule():
+def test_tensor_decay_matches_independent_dense_mask_rule():
     import jax
     import jax.numpy as jnp
     from curvature_compass.lm.config import OptimizerConfig
@@ -39,22 +39,25 @@ def test_phase4_tensor_decay_matches_independent_dense_mask_rule():
     assert bool(stats["parameters_finite"]) and bool(stats["direction_finite_and_descent"])
 
 
-def test_600m_update_traces_without_allocating_a_parameter_sized_decay_mask(monkeypatch):
+def test_125m_update_traces_without_allocating_a_parameter_sized_decay_mask(monkeypatch):
     import jax
     import jax.numpy as jnp
-    from curvature_compass.lm.experiments import load_run_config
+    from curvature_compass.lm.experiments import load_run_config, run_from_dict
     from curvature_compass.lm.execution import OptimizerExecution
     from curvature_compass.lm.model import Decoder
     from curvature_compass.lm.runtime import mesh_and_shardings
-    config = load_run_config("configs/lm600m_tomography.json")
+    base = load_run_config("configs/lm125m_tomography.json")
+    steps = 381
+    config = run_from_dict({**base.to_dict(), "training_steps": steps, "token_budget": steps * 64 * 1024})
     decoder = Decoder(config.model)
-    monkeypatch.setattr(decoder, "decay_mask", lambda: (_ for _ in ()).throw(AssertionError("600M mask allocated")))
+    monkeypatch.setattr(decoder, "decay_mask", lambda: (_ for _ in ()).throw(AssertionError("125M mask allocated")))
     mesh, rep, _ = mesh_and_shardings()
     execution = OptimizerExecution(decoder, config, mesh, rep)
     vector = jax.ShapeDtypeStruct((decoder.parameter_count,), jnp.float32)
     result = jax.eval_shape(execution.update_function(), vector, vector, execution.state_shapes,
                             jax.ShapeDtypeStruct((), jnp.float32))
-    assert result[0].shape == (596993280,) and result[0].dtype == jnp.float32
+    assert result[0].shape == (124_275_456,) and result[0].dtype == jnp.float32
+
 
 
 @pytest.mark.parametrize("method", BASELINES)

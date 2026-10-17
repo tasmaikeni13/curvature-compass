@@ -1,7 +1,7 @@
 """Standard JAX/XLA AdamW, Muon, SOAP, and Sophia-G.
 
-Algorithm references and deliberate implementation choices are registered in
-analysis/phase34_protocol.md. Parameters and all optimizer algebra are float32.
+Competitor optimizer implementations. Parameters and all optimizer algebra
+are float32.
 Muon acts on hidden matrices in (output, input) orientation; its auxiliary
 parameters use AdamW. SOAP skips its initialization batch, maintains Adam
 moments in Shampoo coordinates, and uses the reference permutation/QR refresh.

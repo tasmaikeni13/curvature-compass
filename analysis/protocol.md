@@ -1,12 +1,12 @@
-# Phase 1 protocol, registered before numerical outcomes
+# Directional curvature study protocol, registered before numerical outcomes
 
 ## Scope and stopping rule
 
-Only mission sections 1.1–1.7 are in scope. The finite research budget is a broad
+Foundational research sections are in scope. The finite research budget is a broad
 primary-source search, at least two theory/experiment refinement cycles, diverse
 CPU synthetic studies, and a checked Lean foundation. Stop when each factor cell
 has multiple evaluated candidates, independent evaluation of the selected rules,
-explicit failures, and a defensible next-phase research question. Exhaustive
+explicit failures, and defensible subsequent research questions. Exhaustive
 coverage of all scientific literature and global algorithmic optimality cannot
 be certified; search coverage and gaps must be stated.
 

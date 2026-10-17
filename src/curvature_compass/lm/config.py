@@ -7,17 +7,21 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class ModelConfig:
-    vocab_size: int = 50257
-    padded_vocab_size: int = 50304
-    width: int = 512
-    layers: int = 11
-    heads: int = 8
-    mlp_width: int = 2048
+    vocab_size: int = 32000
+    padded_vocab_size: int = 32768
+    width: int = 768
+    layers: int = 12
+    heads: int = 12
+    mlp_width: int = 2560
     sequence_length: int = 1024
+    rope_theta: float = 10000.0
+    rms_norm_eps: float = 1e-5
 
     def validate(self):
         if min(asdict(self).values()) <= 0 or self.width % self.heads:
             raise ValueError("Positive dimensions and width divisible by heads required")
+        if (self.width // self.heads) % 2 != 0:
+            raise ValueError("Head dimension must be even for RoPE")
         if self.padded_vocab_size < self.vocab_size:
             raise ValueError("Padded vocabulary cannot discard tokenizer classes")
 
@@ -56,7 +60,7 @@ class RunConfig:
     optimizer: OptimizerConfig = field(default_factory=OptimizerConfig)
     seed: int = 31004
     data_seed: int = 32000
-    token_budget: int = 1_000_000_000
+    token_budget: int = 2_500_000_000
     global_batch_size: int = 64
     accumulation_steps: int = 1
     curvature_batch_size: int = 16
@@ -86,7 +90,7 @@ class RunConfig:
             raise ValueError("Accumulation must divide the global batch")
         if self.curvature_batch_size > self.global_batch_size or self.curvature_sequence_length > self.model.sequence_length:
             raise ValueError("Curvature batch must be a prefix of the training batch")
-        if self.compute_dtype not in ("float32", "bfloat16") or self.attention not in ("reference", "sdpa"):
+        if self.compute_dtype not in ("float32", "bfloat16") or self.attention not in ("reference", "sdpa", "flash", "pallas"):
             raise ValueError("Unsupported execution option")
         if min(self.learning_rate, self.gradient_clip) <= 0 or self.weight_decay < 0 or self.warmup_steps < 0:
             raise ValueError("Invalid training controls")

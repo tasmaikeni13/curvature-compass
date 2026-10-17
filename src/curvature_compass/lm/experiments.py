@@ -1,4 +1,4 @@
-"""Phase 4 controls, without changing the frozen Phase 3 numerical configs."""
+"""Experiment and sweep controls for nominal 125M and sweep trials."""
 from dataclasses import dataclass
 import json
 from pathlib import Path
@@ -8,17 +8,21 @@ from .competitors import BaselineConfig
 
 @dataclass(frozen=True)
 class SweepRunConfig(RunConfig):
-    phase: int = 4
-    training_steps: int = 2500
+    training_steps: int = None
+
+    def __post_init__(self):
+        if self.training_steps is None:
+            step_tokens = self.global_batch_size * self.model.sequence_length
+            object.__setattr__(self, "training_steps", self.token_budget // step_tokens)
 
     def validate(self):
         super().validate()
-        if self.phase != 4 or self.training_steps != 2500:
-            raise ValueError("Phase 4 trials require exactly 2,500 training steps")
+        if self.training_steps < 1:
+            raise ValueError("Training steps must be positive")
         if self.token_budget != self.training_steps * self.global_batch_size * self.model.sequence_length:
             raise ValueError("Sweep steps and exact predicted-token budget disagree")
         if self.compute_dtype != "bfloat16" or self.attention != "reference" or self.rematerialize or not self.reuse_linearization:
-            raise ValueError("Phase 4 uses standard XLA, BF16 training, reference attention, and reused linearization")
+            raise ValueError("Sweep trials use standard XLA, BF16 training, reference attention, and reused linearization")
         if isinstance(self.optimizer, BaselineConfig) and self.optimizer.name == "sophia_g" and self.curvature_sequence_length != self.model.sequence_length:
             raise ValueError("Sophia-G curvature samples must cover the full model context")
 
@@ -28,14 +32,14 @@ def optimizer_name(config):
 
 
 def run_from_dict(value):
-    if "phase" not in value:
-        return from_dict(value)
     value = dict(value)
     value["model"] = ModelConfig(**value.get("model", {}))
     optimizer = dict(value.get("optimizer", {}))
     name = optimizer.pop("name", "tomography")
     value["optimizer"] = OptimizerConfig(**optimizer) if name == "tomography" else BaselineConfig(name=name, **optimizer)
-    config = SweepRunConfig(**value)
+    value.pop("phase", None)
+    config_class = SweepRunConfig if "training_steps" in value else RunConfig
+    config = config_class(**value)
     config.validate()
     return config
 

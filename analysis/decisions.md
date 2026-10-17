@@ -2,7 +2,7 @@
 
 ## Before outcome evaluation
 
-1. Restrict work to Phase 1. Create a private repository and register the protocol
+1. Restrict foundational work to synthetic studies. Create a private repository and register the protocol
    before any calibration/evaluation outcomes (commit `03bac29`).
 2. Use a shared Galerkin quadratic step so the two factors have identifiable
    meanings. Separate scalar identifiability from vector acquisition studies.
@@ -68,5 +68,5 @@ the historical record.
 The registered cycle is complete at the stated finite research budget. The next
 unresolved questions are scalable goal-risk estimation, practical noise/drift
 bounds, batched versus sequential HVP cost on accelerators, and behavior on a
-changing stochastic training objective. They require later-phase work and are
+changing stochastic training objective. They require subsequent experimental work and are
 not presented as solved here.

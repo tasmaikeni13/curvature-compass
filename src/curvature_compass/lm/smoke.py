@@ -21,7 +21,7 @@ def smoke(data, output, evidence=None):
     model = ModelConfig(width=16, layers=1, heads=2, mlp_width=32, sequence_length=8)
     results = {}
     for method in METHODS:
-        template = load_run_config(f"configs/lm600m_{method}.json")
+        template = load_run_config(f"configs/lm125m_{method}.json")
         opt = template.optimizer
         if method == "tomography":
             opt = replace(opt, configuration="D", cap=2, refresh_interval=2)
@@ -48,13 +48,13 @@ def smoke(data, output, evidence=None):
             "reference_checkpoint_sha256": sha256(directory / "reference/checkpoints/step-00000003/state.npz"),
             "resumed_checkpoint_sha256": sha256(directory / "resumed/checkpoints/step-00000003/state.npz")}
         print(json.dumps({"optimizer": method, "smoke_and_bitwise_recovery": "passed"}), flush=True)
-    record = {"schema": 1, "phase": 4, "status": "passed", "mode": "small_model_smoke",
+    record = {"schema": 1, "status": "passed", "mode": "small_model_smoke",
         "checks": results, "source_sha256": source_hashes(), "environment": environment(),
         "data_manifest_sha256": sha256(Path(data) / "manifest.json"),
         "scope": "Five tiny-model real-data JAX/XLA update/validation/checkpoint runs and bitwise continuation. No 600M compilation, performance, sweep or full comparison claim."}
     path = Path(evidence) if evidence else Path(output) / "evidence"
     atomic_json(path.with_name(path.name + f"-worker-{jax.process_index()}.json"), record)
-    sync("phase4-small-smoke-complete")
+    sync("smoke-checks-complete")
     return record
 
 

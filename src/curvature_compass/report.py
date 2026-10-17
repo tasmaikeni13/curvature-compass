@@ -108,7 +108,7 @@ def make_report():
     axes[2].legend(fontsize=8)
     figure.savefig(ROOT/"main_comparison.png",dpi=180)
     plt.close(figure)
-    lines=["# Held-out Phase 1 Monte Carlo results","",
+    lines=["# Held-out Monte Carlo results","",
       "The quartet was frozen in commit `6b44ca9` using 24 calibration seeds. The",
       "held-out set has 64 root seeds and 6,144 problem instances. Candidate policies",
       "share full paths for efficient evaluation; counts and times use each exact prefix.","",

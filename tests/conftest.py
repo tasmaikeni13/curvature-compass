@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from curvature_compass.lm.artifacts import atomic_json, sha256
-from curvature_compass.lm.data import DATA_REVISION, TOKENIZER_REVISION, document_key, split_for
+from curvature_compass.lm.data import DATA_REVISION, TOKENIZER_REVISION, VOCAB_SIZE, document_key, split_for
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def fixture_data(tmp_path):
             p = root / (split + suffix)
             files[p.name] = {"bytes": p.stat().st_size, "sha256": sha256(p)}
     atomic_json(root / "manifest.json", {"schema": 1, "dataset_revision": DATA_REVISION,
-                "tokenizer_revision": TOKENIZER_REVISION, "vocab_size": 50257,
+                "tokenizer_revision": TOKENIZER_REVISION, "vocab_size": VOCAB_SIZE,
                 "files": files, "predicted_tokens": counts, "complete_source_scan": False,
                 "fixture_only": True})
     return root

@@ -1,1 +1,1 @@
-"""Synthetic Phase 1 investigations; no model training code."""
+"""Curvature Compass directional curvature estimation and optimizer research."""

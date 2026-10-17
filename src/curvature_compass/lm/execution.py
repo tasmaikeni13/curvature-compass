@@ -13,13 +13,11 @@ class OptimizerExecution:
     def __init__(self, decoder, config, mesh, replicated):
         self.decoder, self.config = decoder, config
         self.tomography = not isinstance(config.optimizer, BaselineConfig)
-        self.phase4 = getattr(config, "phase", 3) == 4
-        self.needs_prior = self.tomography and (not self.phase4 or not config.optimizer.adaptive_alignment)
+        self.needs_prior = self.tomography and not config.optimizer.adaptive_alignment
         self.replicated = replicated
-        # At 600M, replicating both a rank-eight prior and basis exceeds a v4
-        # device's memory before model/gradient storage. Shard their columns.
-        columns = NamedSharding(mesh, P(None, "data")) if self.phase4 else replicated
-        if self.tomography and self.phase4 and decoder.parameter_count % mesh.size:
+        # Shard basis and prior columns across data mesh to conserve device memory.
+        columns = NamedSharding(mesh, P(None, "data"))
+        if self.tomography and decoder.parameter_count % mesh.size:
             raise ValueError("Tomography parameter dimension must divide the basis mesh")
         self.state_sharding = TomographyState(columns, replicated, replicated, replicated) if self.tomography else replicated
         self.prior_sharding = columns if self.needs_prior else replicated
@@ -56,27 +54,18 @@ class OptimizerExecution:
     def update_function(self):
         if not self.tomography:
             return make_baseline_update(self.decoder, self.config)
-        if self.phase4:
-            # Avoid constructing/capturing a 600M-element decay constant.
-            # Eligibility and the damped direction match the frozen 60M rule.
-            def tensor_update(parameters, gradient, state, rate):
-                delta, stats = direction(gradient, state, self.config.optimizer)
-                values = []
-                for (_, shape), (start, stop) in zip(self.decoder.layout, self.decoder.offsets):
-                    decay = self.config.weight_decay if len(shape) >= 2 else 0.
-                    values.append(parameters[start:stop] * (1 - rate * decay) + rate * delta[start:stop])
-                parameters = jnp.concatenate(values)
-                stats["parameters_finite"] = jnp.all(jnp.isfinite(parameters))
-                return parameters, state, stats
-
-            return tensor_update
-        update = make_update(self.decoder, self.config)
-
-        def wrapped(parameters, gradient, state, rate):
-            parameters, stats = update(parameters, gradient, state, rate)
+        # Avoid constructing/capturing an oversized parameter-dimension decay constant.
+        def tensor_update(parameters, gradient, state, rate):
+            delta, stats = direction(gradient, state, self.config.optimizer)
+            values = []
+            for (_, shape), (start, stop) in zip(self.decoder.layout, self.decoder.offsets):
+                decay = self.config.weight_decay if len(shape) >= 2 else 0.
+                values.append(parameters[start:stop] * (1 - rate * decay) + rate * delta[start:stop])
+            parameters = jnp.concatenate(values)
+            stats["parameters_finite"] = jnp.all(jnp.isfinite(parameters))
             return parameters, state, stats
 
-        return wrapped
+        return tensor_update
 
     def restore(self, arrays, metadata):
         if metadata.get("optimizer_state_format") != "leaves-v1":

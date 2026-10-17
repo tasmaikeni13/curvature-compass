@@ -1,6 +1,0 @@
-COMPASS_WORKER_READY
-{"optimizer": "tomography", "smoke_and_bitwise_recovery": "passed"}
-{"optimizer": "adamw", "smoke_and_bitwise_recovery": "passed"}
-{"optimizer": "muon", "smoke_and_bitwise_recovery": "passed"}
-{"optimizer": "soap", "smoke_and_bitwise_recovery": "passed"}
-{"optimizer": "sophia_g", "smoke_and_bitwise_recovery": "passed"}

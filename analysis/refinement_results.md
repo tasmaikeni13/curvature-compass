@@ -111,5 +111,5 @@ and a small scalar Bayesian goal-design result is prior-art-compatible and
 non-scalable. It did not establish an implementable LM method, practical noise
 or drift estimator, globally reliable nonconvex strategy, or superiority over
 modern training systems. The finite budget is complete after the registered
-cycle and literature revisit; those unresolved items belong in later-phase
-research questions, not claims of Phase 1 completion.
+cycle and literature revisit; those unresolved items belong in subsequent
+research questions, not claims of complete curvature coverage.

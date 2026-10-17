@@ -55,21 +55,22 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     mesh, replicated, batch_sharding = mesh_and_shardings()
     optimizer = OptimizerExecution(decoder, config, mesh, replicated)
     frame, prior_hash = None, None
+    if prior_path is not None:
+        prior_hash = sha256(prior_path)
     if optimizer.needs_prior:
         if prior_path is None:
             raise ValueError("This tomography configuration requires its independent model-scale PCA prior")
         frame, prior_record = load_prior(prior_path, decoder, config.optimizer.cap, data_hash)
         if prior_record["seed"] == config.seed:
             raise ValueError("Fixed prior must use an independent model initialization")
-        prior_hash = sha256(prior_path)
     env, sources = environment(), source_hashes()
     if smoke_steps is None:
-        if optimizer.phase4:
+        if getattr(config, "training_steps", None) is not None:
             from .sweep_gate import validate_sweep_gate
             validate_sweep_gate(gate, config, data_hash, prior_hash, env)
         else:
-            if not manifest["complete_source_scan"] or config.token_budget < 900_000_000:
-                raise ValueError("Full comparison requires the approximately 1B-token prepared corpus")
+            if not manifest["complete_source_scan"] or config.token_budget < 2_400_000_000:
+                raise ValueError("Full comparison requires the complete 2.5B-token prepared corpus")
             validate_gate(gate, config, data_hash, prior_hash, env)
     if config.global_batch_size % (config.accumulation_steps * jax.device_count()):
         raise ValueError("Each gradient microbatch must divide the global device mesh")
@@ -116,20 +117,41 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                     if row["step"] <= step:
                         stream.write(json.dumps(row, allow_nan=False) + "\n")
     else:
-        parameters = jax.device_put(decoder.initialize(config.seed), replicated)
+        init_params = decoder.initialize(config.seed)
+        parameters = jax.device_put(init_params, replicated)
         state = optimizer.empty()
     jax.block_until_ready((parameters, state))
     state_seconds = time.perf_counter() - state_started
+
+    # Fast bounded smoke test parameter validation
+    if smoke_steps is not None and not resume:
+        params_host = np.asarray(parameters)
+        if not np.all(np.isfinite(params_host)):
+            raise FloatingPointError("Initial parameters contain non-finite values (NaN/Inf)")
+        if np.linalg.norm(params_host) == 0:
+            raise ValueError("Initial parameters have zero norm")
+        if any("bias" in name for name, _ in decoder.layout):
+            raise ValueError("Model layout contains bias terms; LLaMA architecture must be strictly bias-free")
+        unpacked = decoder.unpack(params_host)
+        for name, array in unpacked.items():
+            if "norm" in name and not np.allclose(array, 1.0):
+                raise ValueError(f"RMSNorm weight {name} not initialized to 1.0")
+        if config.model.width == 768 and config.model.layers == 12:
+            if decoder.parameter_count != 124_275_456:
+                raise ValueError(
+                    f"Nominal 125M LLaMA model requires exactly 124,275,456 parameters, got {decoder.parameter_count}"
+                )
+
     prior = optimizer.put_prior(frame)
     del frame
-    record = {"schema": 1, "mode": "smoke" if smoke_steps is not None else "comparison", "phase": getattr(config, "phase", 3),
+    record = {"schema": 1, "mode": "smoke" if smoke_steps is not None else "comparison",
               "optimizer": optimizer_name(config), "config": config.to_dict(),
               "config_hash": config.fingerprint, "data_hash": data_hash, "prior_hash": prior_hash,
               "source_sha256": sources, "environment": env, "parameter_count": decoder.parameter_count,
               "recovery": recovery, "smoke_step_limit": smoke_steps, "validation_tokens": validation_budget,
               "initialization_or_recovery_seconds": state_seconds,
               "optimizer_state_global_bytes": sum(math.prod(a.shape) * a.dtype.itemsize for a in jax.tree.leaves(optimizer.state_shapes)),
-              "optimizer_state_placement": "Tomography basis columns sharded; other state replicated" if optimizer.tomography and optimizer.phase4 else "Replicated",
+              "optimizer_state_placement": "Tomography basis columns sharded; other state replicated" if optimizer.tomography else "Replicated",
               "rng": "Dropout=0; initialization and deterministic data permutation use the recorded seeds. Sophia-G sampled labels use a stateless seed+step key."}
     atomic_json(run_path, record)
     requested = [False]
@@ -139,6 +161,8 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     total_steps = math.ceil(len(train.order) / config.global_batch_size)
     stop_step = total_steps if smoke_steps is None else min(total_steps, smoke_steps)
     gradient_function = jax.jit(make_gradient(decoder, config), in_shardings=(replicated, (batch_sharding,) * 3), out_shardings=replicated)
+    smoke_eval_function = jax.jit(lambda p, b: decoder.training_loss(p, b, config.accumulation_steps, compute_dtype=config.compute_dtype, attention=config.attention, rematerialize=config.rematerialize),
+        in_shardings=(replicated, (batch_sharding,) * 3), out_shardings=replicated)
     refresh_raw = optimizer.refresh_function()
     refresh_function = None if refresh_raw is None else jax.jit(refresh_raw,
         in_shardings=(replicated, replicated, (batch_sharding,) * 3, optimizer.prior_sharding, replicated, optimizer.state_sharding),
@@ -164,6 +188,7 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
     atomic_json(run_path, record)
     del example_gradient, first_batch, first_curvature, first_eval
     started, evaluations, last_saved = time.perf_counter(), previous_evaluations, -1
+    smoke_verification = None
 
     def evaluate():
         t = time.perf_counter()
@@ -216,8 +241,10 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                 gradient, gradient_norm = clip_function(gradient)
                 jax.block_until_ready((loss, gradient, gradient_norm))
                 gradient_seconds = time.perf_counter() - t
-                if not np.isfinite(float(host_array(loss))) or not np.isfinite(float(host_array(gradient_norm))):
-                    raise FloatingPointError("Nonfinite loss/gradient; last checkpoint remains intact")
+                loss_val = float(host_array(loss))
+                grad_norm_val = float(host_array(gradient_norm))
+                if not np.isfinite(loss_val) or not np.isfinite(grad_norm_val) or grad_norm_val <= 0:
+                    raise FloatingPointError("Nonfinite or zero loss/gradient; last checkpoint remains intact")
                 refresh = optimizer.should_refresh(step, state)
                 curvature_seconds, acquisition = 0., {"hvp_count": 0, "finite": True}
                 if refresh:
@@ -239,14 +266,40 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                 update_stats = host_stats(raw_update)
                 if not update_stats["parameters_finite"] or (optimizer.tomography and not update_stats["direction_finite_and_descent"]):
                     raise FloatingPointError("Invalid update; recover from last committed checkpoint")
+
+                # Verify loss descent in smoke mode on the first active update step
+                is_update_step = not update_stats.get("soap_initialization_batch", False)
+                if smoke_steps is not None and not resume and smoke_verification is None and is_update_step:
+                    loss_after = float(host_array(smoke_eval_function(parameters, batch)))
+                    loss_drop = loss_val - loss_after
+                    if loss_after >= loss_val:
+                        raise FloatingPointError(
+                            f"Loss did not descend on training batch: initial={loss_val:.4f}, "
+                            f"after_step={loss_after:.4f}, drop={loss_drop:.6f}"
+                        )
+                    smoke_verification = {
+                        "parameter_initialization_finite": True,
+                        "bias_free": True,
+                        "rmsnorm_unit_initialized": True,
+                        "parameter_count": decoder.parameter_count,
+                        "parameter_count_valid": (decoder.parameter_count == 124_275_456 if config.model.width == 768 else True),
+                        "gradient_norm_finite": True,
+                        "gradient_norm_positive": True,
+                        "loss_finite": True,
+                        "loss_descent": True,
+                        "initial_loss": loss_val,
+                        "loss_after_step": loss_after,
+                        "loss_drop": loss_drop,
+                    }
+
                 # Host count is derived independently from the deterministic permutation.
                 predicted = int(sum(train.batch(cursor, config.global_batch_size)[2].sum(axis=1)))
                 cursor += config.global_batch_size
                 tokens += predicted
                 step += 1
                 row = {"step": step, "tokens": tokens, "predicted_tokens": predicted,
-                       "training_loss": float(host_array(loss)), "learning_rate": rate,
-                       "gradient_norm": float(host_array(gradient_norm)), "refresh": refresh,
+                       "training_loss": loss_val, "learning_rate": rate,
+                       "gradient_norm": grad_norm_val, "refresh": refresh,
                        "curvature_age": optimizer.age(step - 1, state),
                        "curvature_tokens": int(train.batch(cursor - config.global_batch_size, config.curvature_batch_size, prefix_length=config.curvature_sequence_length)[2].sum()) if refresh else 0,
                        "curvature_positions_processed": config.curvature_batch_size * config.curvature_sequence_length if refresh else 0,
@@ -272,7 +325,7 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
         if step == total_steps and not complete_budget:
             raise ValueError("Completed block stream did not match exact training token budget")
         elapsed = previous_seconds + time.perf_counter() - started
-        summary = {"schema": 1, "status": status, "mode": record["mode"], "phase": record["phase"],
+        summary = {"schema": 1, "status": status, "mode": record["mode"],
                    "optimizer": optimizer_name(config), "configuration": getattr(config.optimizer, "configuration", None),
                    "config_hash": config.fingerprint, "parameter_count": decoder.parameter_count,
                    "step": step, "tokens": tokens, "target_tokens": config.token_budget,
@@ -285,6 +338,8 @@ def execute(config, data, prior_path, output, smoke_steps=None, gate=None, resum
                    "device_memory_stats": [d.memory_stats() for d in jax.local_devices()],
                    "data_manifest_sha256": data_hash, "prior_sha256": prior_hash, "source_sha256": sources,
                    "environment": env, "note": "Smoke outcomes validate infrastructure; they are not full-comparison optimizer results." if smoke_steps is not None else None}
+        if smoke_verification is not None:
+            summary["smoke_verification"] = smoke_verification
         atomic_json(output / f"summary-worker-{host_index}.json", summary)
         return summary
     except BaseException as error:
@@ -300,7 +355,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
     parser.add_argument("--data", required=True, type=Path)
-    parser.add_argument("--prior", type=Path, help="Required for Phase 3 and fixed-alignment Phase 4 tomography")
+    parser.add_argument("--prior", type=Path, help="Required for fixed-alignment tomography")
     parser.add_argument("--output", required=True, type=Path)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--smoke-steps", type=int)

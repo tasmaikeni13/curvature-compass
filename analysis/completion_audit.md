@@ -1,4 +1,4 @@
-# Phase 1 completion audit
+# Directional curvature foundation completion audit
 
 This audit follows the finite budget registered in `protocol.md`. “Complete”
 means the deliverable and its stated scope are present; it does not mean the
@@ -17,5 +17,5 @@ exhausted.
 
 The checked-in raw-data and source hashes, row counts, literature count, and Lean
 log were verified by `analysis/audit_artifacts.py`; its output is
-`analysis/results/integrity_audit.json`. No Phase 2 or later training or
+`analysis/results/integrity_audit.json`. No large-scale model training or
 infrastructure work is included.

@@ -31,6 +31,6 @@ accepted if the build fails or prints `sorryAx`.
 
 The prepared language-model optimizer uses stochastic, possibly indefinite
 curvature, damping and reduced eigenvalue clipping. Its residual stopping
-policy is heuristic; the Phase 1 SPD certificate does not establish a Newton
+policy is heuristic; the formal SPD certificate does not establish a Newton
 error bound for those runs. No language-model theorem or empirical optimizer
 advantage is claimed by these proofs.

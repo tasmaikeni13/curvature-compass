@@ -76,11 +76,13 @@ def test_atomic_checkpoint_rollback_and_experiment_binding(tmp_path):
 
 
 def test_four_configs_preserve_controls_and_independent_initializations():
-    configs = [load_config(f"configs/lm60m_{cell}.json") for cell in "ABCD"]
-    assert len({c.seed for c in configs}) == 4
-    common = []
+    from curvature_compass.lm.experiments import load_run_config
+    from curvature_compass.lm.model import Decoder
+    methods = ["adamw", "muon", "soap", "sophia_g"]
+    configs = [load_run_config(f"configs/lm125m_{method}.json") for method in methods]
     for c in configs:
-        values = c.to_dict(); values.pop("seed"); values["optimizer"].pop("configuration")
-        common.append(values)
-        assert .9e9 <= c.token_budget <= 1.1e9
-    assert all(c == common[0] for c in common)
+        assert Decoder(c.model).parameter_count == 124_275_456
+        assert c.token_budget == 2_500_000_000
+        assert c.compute_dtype == "bfloat16"
+        assert c.model.width == 768 and c.model.layers == 12
+

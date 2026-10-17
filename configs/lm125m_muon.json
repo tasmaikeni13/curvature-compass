@@ -1,0 +1,42 @@
+{
+  "accumulation_steps": 1,
+  "attention": "reference",
+  "checkpoint_interval": 250,
+  "compute_dtype": "bfloat16",
+  "curvature_batch_size": 16,
+  "curvature_sequence_length": 1024,
+  "data_seed": 52001,
+  "eval_interval": 100,
+  "global_batch_size": 64,
+  "gradient_clip": 1.0,
+  "keep_checkpoints": 2,
+  "learning_rate": 0.02,
+  "minimum_lr_ratio": 0.1,
+  "model": {
+    "heads": 12,
+    "layers": 12,
+    "mlp_width": 2560,
+    "padded_vocab_size": 32768,
+    "rms_norm_eps": 1e-05,
+    "rope_theta": 10000.0,
+    "sequence_length": 1024,
+    "vocab_size": 32000,
+    "width": 768
+  },
+  "optimizer": {
+    "auxiliary_lr_ratio": 0.015,
+    "beta2": 0.95,
+    "epsilon": 1e-08,
+    "momentum": 0.95,
+    "name": "muon",
+    "nesterov": true,
+    "ns_steps": 5
+  },
+  "rematerialize": false,
+  "reuse_linearization": true,
+  "seed": 51001,
+  "token_budget": 2500000000,
+  "validation_tokens": 1048576,
+  "warmup_steps": 200,
+  "weight_decay": 0.1
+}

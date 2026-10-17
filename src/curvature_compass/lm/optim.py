@@ -41,7 +41,7 @@ def acquire(hvp, gradient, prior, config: OptimizerConfig, step=0):
     """One HVP per executed loop body; C/D do not evaluate discarded suffixes.
 
     This is an empirical stop for a stochastic, possibly clipped operator.
-    It is deliberately not reported as a Phase 1 residual certificate.
+    It is deliberately not reported as a certified Newton residual bound.
     """
     n, cap = gradient.shape[0], config.cap
     initial_norm = jnp.linalg.norm(gradient)

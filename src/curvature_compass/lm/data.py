@@ -11,10 +11,15 @@ from .artifacts import atomic_json, sha256
 
 DATASET = "codelion/fineweb-edu-1B"
 DATA_REVISION = "66b78cd134ab7b0545a1a618a1cc029f3091eb20"
-TOKENIZER = "openai-community/gpt2"
-TOKENIZER_REVISION = "607a30d783dfa663caf39e06633721c8d4cfcd7e"
-SPLIT_SALT = b"curvature-compass-phase23-v1\0"
-EOS = 50256
+TOKENIZER = "hf-internal-testing/llama-tokenizer"
+TOKENIZER_REVISION = "d02ad6cb9dd2c2296a6332199fa2fdca5938fef0"
+SPLIT_SALT = b"curvature-compass-v1\0"
+VOCAB_SIZE = 32_000
+PADDED_VOCAB_SIZE = 32_768
+UNK = 0
+BOS = 1
+EOS = 2
+PAD = 2
 
 
 def document_key(text):
@@ -38,7 +43,10 @@ def prepare(output, train_tokens=1_000_000_000, validation_tokens=1_048_576,
     started = time.perf_counter()
     tokenizer_path = hf_hub_download(TOKENIZER, "tokenizer.json", revision=TOKENIZER_REVISION)
     tokenizer = Tokenizer.from_file(tokenizer_path)
-    if tokenizer.get_vocab_size() != 50257 or tokenizer.token_to_id("<|endoftext|>") != EOS:
+    if (tokenizer.get_vocab_size() != VOCAB_SIZE
+            or tokenizer.token_to_id("<s>") != BOS
+            or tokenizer.token_to_id("</s>") != EOS
+            or tokenizer.token_to_id("<unk>") != UNK):
         raise ValueError("Unexpected pinned tokenizer vocabulary")
     targets = {"train": train_tokens + 1, "validation": validation_tokens + 1,
                "calibration": calibration_tokens + 1}
@@ -69,7 +77,7 @@ def prepare(output, train_tokens=1_000_000_000, validation_tokens=1_048_576,
                     seen.add(key)
                     pending.append((text, key, split_for(key)))
                 for (_, key, split), encoded in zip(pending, tokenizer.encode_batch([p[0] for p in pending], add_special_tokens=False)):
-                    ids = encoded.ids + [EOS]
+                    ids = [BOS] + encoded.ids + [EOS]
                     observed[split] += len(ids)
                     docs[split] += 1
                     remaining = targets[split] - counts[split]
@@ -94,7 +102,8 @@ def prepare(output, train_tokens=1_000_000_000, validation_tokens=1_048_576,
                 files[final.name] = {"bytes": final.stat().st_size, "sha256": sha256(final)}
         manifest = {"schema": 1, "dataset": DATASET, "dataset_revision": DATA_REVISION,
                     "tokenizer": TOKENIZER, "tokenizer_revision": TOKENIZER_REVISION,
-                    "tokenizer_sha256": sha256(tokenizer_path), "vocab_size": 50257, "eos_id": EOS,
+                    "tokenizer_sha256": sha256(tokenizer_path), "vocab_size": VOCAB_SIZE,
+                    "padded_vocab_size": PADDED_VOCAB_SIZE, "bos_id": BOS, "eos_id": EOS, "pad_id": PAD,
                     "dtype": "<u2", "split_salt": SPLIT_SALT.decode(), "sources": sources,
                     "rows_read": rows, "duplicate_documents": duplicate_count,
                     "complete_source_scan": max_documents is None, "max_documents": max_documents,
@@ -102,7 +111,7 @@ def prepare(output, train_tokens=1_000_000_000, validation_tokens=1_048_576,
                     "stored_tokens": counts, "predicted_tokens": {k: max(0, v - 1) for k, v in counts.items()},
                     "target_predicted_tokens": {k: v - 1 for k, v in targets.items()},
                     "files": files, "seconds": time.perf_counter() - started,
-                    "packing": "Continuous exact-text BPE with one EOS per document, shifted next-token targets; no BOS; block contexts may cross document boundaries."}
+                    "packing": "Continuous exact-text BPE with BOS (1) prefix and EOS (2) suffix per document, shifted next-token targets; block contexts may cross document boundaries."}
         atomic_json(output / "manifest.json", manifest)
         return manifest
     finally:
@@ -136,13 +145,14 @@ def verify_data(directory, full=True):
 
 class TokenBlocks:
     """A permutation of blocks, never a repeated or replacement token stream."""
-    def __init__(self, path, sequence_length, budget=None, seed=None, eos=EOS):
+    def __init__(self, path, sequence_length, budget=None, seed=None, eos=EOS, pad=None):
         self.tokens = np.memmap(path, dtype="<u2", mode="r")
         self.budget = len(self.tokens) - 1 if budget is None else budget
         if self.budget < 1 or self.budget + 1 > len(self.tokens):
             raise ValueError("Prepared split cannot supply requested predicted tokens")
         self.sequence_length = sequence_length
         self.eos = eos
+        self.pad = eos if pad is None else pad
         self.order = np.arange(math.ceil(self.budget / sequence_length), dtype=np.int64)
         if seed is not None:
             np.random.default_rng(seed).shuffle(self.order)
@@ -152,7 +162,7 @@ class TokenBlocks:
         length = self.sequence_length if prefix_length is None else prefix_length
         if not 0 < length <= self.sequence_length or cursor < 0 or local_start < 0 or local_start + size > global_size:
             raise ValueError("Invalid block batch request")
-        x = np.full((size, length), self.eos, dtype=np.int32)
+        x = np.full((size, length), self.pad, dtype=np.int32)
         y = x.copy()
         mask = np.zeros((size, length), dtype=np.float32)
         for i in range(size):

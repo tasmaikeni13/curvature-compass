@@ -1,8 +1,10 @@
 from dataclasses import replace
+import inspect
 import jax
 import jax.numpy as jnp
 import numpy as np
 import pytest
+from curvature_compass.lm import competitors
 from curvature_compass.lm.competitors import (BaselineConfig, bartlett_diagonal, empty_baseline_state,
     make_baseline_update, make_sophia_refresh, newton_schulz)
 from curvature_compass.lm.config import ModelConfig, RunConfig
@@ -98,7 +100,7 @@ def test_soap_projected_adam_and_reference_initialization():
         expected[start:stop] = ((initial[start:stop].reshape(shape) - .001 * delta) * (1 - .001 * (.1 if len(shape) == 2 else 0))).reshape(-1)
     # Rank-deficient rectangular factors have arbitrary null-space eigenvectors;
     # test the full-rank square attention block independently of that ambiguity.
-    index = next(i for i, (name, _) in enumerate(model.layout) if name == "block.0.attention.weight")
+    index = next(i for i, (name, _) in enumerate(model.layout) if name in ("block.0.o_proj.weight", "block.0.attention.weight"))
     start, stop = model.offsets[index]
     np.testing.assert_allclose(np.asarray(p)[start:stop], expected[start:stop], atol=2e-6, rtol=1e-4)
     assert bool(stats["parameters_finite"]) and bool(stats["preconditioner_refreshed"])
@@ -183,5 +185,88 @@ def test_sophia_full_context_measures_every_position_and_rejects_short_sweep_con
     x = jnp.arange(8)[None, :]
     state, _ = jax.jit(make_sophia_refresh(model, config))(jnp.asarray(model.initialize(9)),
         (x, x, jnp.ones_like(x, dtype=jnp.float32)), empty_baseline_state(model, opt), jnp.array(0, jnp.int32))
-    position = next(i for i, (name, _) in enumerate(model.layout) if name == "position_embedding")
-    assert np.all(np.asarray(state.tensors[position].variance).sum(axis=1) > 0)
+    token_emb = next(i for i, (name, _) in enumerate(model.layout) if name == "token_embedding")
+    assert np.all(np.asarray(state.tensors[token_emb].variance)[:8].sum(axis=1) > 0)
+    assert sum(float(jnp.sum(t.variance)) for t in state.tensors) > 0
+
+
+def test_competitors_zero_pallas_and_pure_jax_ast():
+    """Assert competitors.py contains strictly zero custom Pallas or Mosaic kernels."""
+    src = inspect.getsource(competitors).lower()
+    assert "pallas" not in src, "competitors.py must not reference or import pallas"
+    assert "mosaic" not in src, "competitors.py must not reference or import mosaic"
+
+
+@pytest.mark.parametrize("opt_name", ["adamw", "muon", "soap", "sophia_g"])
+def test_baseline_optimizers_execute_pure_jax_on_llama(opt_name):
+    """Verify all 4 baseline optimizers step cleanly on modern LLaMA under pure JAX JIT."""
+    model = Decoder(ModelConfig(vocab_size=32, padded_vocab_size=32, width=16, layers=2,
+                                heads=2, mlp_width=32, sequence_length=16))
+    p0 = jnp.asarray(model.initialize(42))
+    tokens = jnp.ones((2, 16), dtype=jnp.int32)
+    targets = jnp.ones((2, 16), dtype=jnp.int32)
+    mask = jnp.ones((2, 16), dtype=jnp.float32)
+    batch = (tokens, targets, mask)
+
+    bcfg = BaselineConfig(name=opt_name, ns_steps=5, precondition_frequency=1)
+    rcfg = RunConfig(model=model.config, optimizer=bcfg, weight_decay=0.1,
+                     compute_dtype="float32", attention="reference")
+    state = empty_baseline_state(model, bcfg)
+
+    if opt_name == "sophia_g":
+        refresh_fn = jax.jit(make_sophia_refresh(model, rcfg))
+        state, rstats = refresh_fn(p0, batch, state, jnp.array(0, jnp.int32))
+        assert bool(rstats["finite"])
+
+    loss_fn = lambda p: model.loss(p, batch, compute_dtype="float32", attention="reference")
+    grad = jax.grad(loss_fn)(p0)
+    update_fn = jax.jit(make_baseline_update(model, rcfg))
+
+    p1, state, ustats = update_fn(p0, grad, state, 0.001)
+    assert bool(ustats["parameters_finite"])
+    assert bool(ustats["optimizer_state_finite"])
+    assert jnp.all(jnp.isfinite(p1))
+
+
+@pytest.mark.parametrize("opt_name", ["adamw", "muon", "soap", "sophia_g"])
+def test_baseline_weight_decay_filtering_on_llama_rmsnorm(opt_name):
+    """Verify 0.0 weight decay on 1D RMSNorm scales and positive decay on 2D matrices."""
+    model = Decoder(ModelConfig(vocab_size=32, padded_vocab_size=32, width=16, layers=2,
+                                heads=2, mlp_width=32, sequence_length=16))
+    p0 = jnp.asarray(model.initialize(42))
+    zero_grad = jnp.zeros_like(p0)
+    rate, wd = 0.01, 0.1
+
+    bcfg = BaselineConfig(name=opt_name, ns_steps=5, precondition_frequency=1)
+    rcfg = RunConfig(model=model.config, optimizer=bcfg, weight_decay=wd)
+    state = empty_baseline_state(model, bcfg)
+    update_fn = jax.jit(make_baseline_update(model, rcfg))
+
+    p1, state, _ = update_fn(p0, zero_grad, state, rate)
+    if opt_name == "soap":
+        # SOAP skips step 0 as initialization batch; evaluate step 1
+        p_eval, _, _ = update_fn(p1, zero_grad, state, rate)
+    else:
+        p_eval = p1
+
+    p_dict = model.unpack(np.asarray(p_eval))
+    p0_dict = model.unpack(np.asarray(p0))
+
+    # 1D RMSNorm scale parameters: must have 0.0 weight decay
+    for norm_key in ("block.0.input_norm.weight", "block.0.post_attention_norm.weight", "final_norm.weight"):
+        np.testing.assert_array_equal(p_dict[norm_key], p0_dict[norm_key],
+                                      err_msg=f"{opt_name} must apply 0.0 weight decay to {norm_key}")
+
+    # 2D projection weights: must decay
+    for proj_key in ("block.0.q_proj.weight", "block.0.gate_proj.weight"):
+        expected = p0_dict[proj_key] * (1.0 - rate * wd)
+        np.testing.assert_allclose(p_dict[proj_key], expected, rtol=1e-5)
+
+    # 2D token embedding: verify exact decay accounting
+    if opt_name == "muon":
+        expected_emb = p0_dict["token_embedding"] * (1.0 - rate * bcfg.auxiliary_lr_ratio * wd)
+        np.testing.assert_allclose(p_dict["token_embedding"], expected_emb, rtol=1e-6)
+    else:
+        expected_emb = p0_dict["token_embedding"] * (1.0 - rate * wd)
+        np.testing.assert_allclose(p_dict["token_embedding"], expected_emb, rtol=1e-5)
+

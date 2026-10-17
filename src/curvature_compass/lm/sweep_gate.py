@@ -1,4 +1,4 @@
-"""Bind explicit Phase 4 launches to a frozen plan and real full-shape smokes."""
+"""Bind launches to a frozen plan and real full-shape smokes."""
 import argparse
 import json
 from pathlib import Path
@@ -52,7 +52,7 @@ def create(plan_path, data, smokes, cpu_tests, output, prior=None):
     tree = ET.parse(cpu_tests)
     names = [t.attrib["name"] for t in tree.findall(".//testcase")]
     if any(tree.findall(".//" + tag) for tag in ("failure", "error", "skipped")) or any(not any(n.startswith(required) for n in names) for required in REQUIRED_CPU_TESTS):
-        raise ValueError("Phase 4 CPU correctness/recovery/workflow coverage is missing or failed")
+        raise ValueError("CPU correctness/recovery/workflow coverage is missing or failed")
     manifest = verify_data(data, full=True)
     if not manifest["complete_source_scan"] or manifest["predicted_tokens"]["train"] < plan["entries"][0]["config"]["token_budget"]:
         raise ValueError("Gate requires the real prepared corpus with sufficient nonrepeated tokens")
@@ -115,7 +115,7 @@ def create(plan_path, data, smokes, cpu_tests, output, prior=None):
     needed = {r["state_shape_key"] for r in requirements(plan_path)}
     if not needed <= covered:
         raise ValueError("Missing full-shape smoke/recovery evidence for optimizer state shapes: " + str(len(needed - covered)))
-    record = {"schema": 1, "phase": 4, "status": "passed", "plan_path": str(plan_path.resolve()),
+    record = {"schema": 1, "status": "passed", "plan_path": str(plan_path.resolve()),
         "plan_sha256": sha256(plan_path), "validated_config_hashes": sorted(configs),
         "source_sha256": source_hashes(), "data_manifest_sha256": data_hash,
         "prior_sha256_by_optimizer": prior_hashes, "environment": env, "covered_state_shapes": sorted(covered),
@@ -128,8 +128,8 @@ def create(plan_path, data, smokes, cpu_tests, output, prior=None):
 def validate_sweep_gate(path, config, data_hash, prior_hash, environment):
     from .sweep import load_plan
     gate = json.loads(Path(path).read_text())
-    if gate.get("schema") != 1 or gate.get("phase") != 4 or gate.get("status") != "passed":
-        raise ValueError("Phase 4 needs its own successful full-shape smoke gate")
+    if gate.get("schema") != 1 or gate.get("status") != "passed":
+        raise ValueError("Gate requires a successful full-shape smoke validation")
     plan = load_plan(gate["plan_path"], current_source=True)
     if sha256(gate["plan_path"]) != gate["plan_sha256"] or config.fingerprint not in gate["validated_config_hashes"]:
         raise ValueError("Sweep controls differ from the gated plan")
@@ -161,7 +161,7 @@ def main():
     create_parser.add_argument("--data", required=True, type=Path)
     create_parser.add_argument("--prior", type=Path)
     create_parser.add_argument("--smokes", required=True, nargs="+", type=Path)
-    create_parser.add_argument("--cpu-tests", type=Path, default=Path("analysis/results/phase23/cpu_tests.xml"))
+    create_parser.add_argument("--cpu-tests", type=Path, default=Path("analysis/results/cpu_tests.xml"))
     create_parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     if args.command == "requirements":

@@ -152,7 +152,7 @@ at those scales. The small-matrix prior winner cannot be carried over verbatim.
 Defensible future A/C candidates are structured or sparse fixed streams and
 externally calibrated block priors; B/D candidates are short-recurrence (P)CG
 with declared SPD curvature and damping. Block structure alters the approximation
-target and needs explicit validation. This is a feasibility analysis, not Phase 2
+target and needs explicit validation. This is a feasibility analysis, not full
 implementation or authorization to start model training.
 
 ## Statistical safeguards and ratio interpretation
@@ -175,4 +175,4 @@ Repeated quadratics include both equal-HVP and declared equal-work perspectives.
 A zero-HVP method such as L-BFGS cannot be fairly limited solely by HVP count.
 Actual runtimes are implementation- and host-specific; small dense numerical
 studies do not predict neural-network wall-clock speed, generalization, or
-stochastic training stability. Such claims remain unresolved after Phase 1.
+stochastic training stability. Such claims remain unresolved in synthetic settings.
